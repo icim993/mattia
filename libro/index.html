@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f2e9">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="book-base" content="./">
+  <title>Il libro di Mattia — Un album di famiglia</title>
+  <meta name="description" content="Uno spazio privato per conservare i ricordi della nostra famiglia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Vai al contenuto</a>
+  <div class="page-leaf page-leaf-left" aria-hidden="true">✺</div>
+  <div class="page-leaf page-leaf-right" aria-hidden="true">✺</div>
+  <header class="topbar">
+    <a class="home-link" href="../"><span aria-hidden="true">←</span> Torna al sito</a>
+    <a class="brand" href="./" aria-label="Il libro di Mattia, pagina iniziale">m <span aria-hidden="true">♡</span> a</a>
+    <nav class="nav-actions" aria-label="Navigazione">
+      <a id="admin-link" href="admin/" class="nav-link" hidden>Gestisci</a>
+      <button id="logout-button" type="button" class="ghost" hidden>Esci</button>
+    </nav>
+  </header>
+
+  <main id="main" class="site-container">
+    <section class="intro" aria-labelledby="book-title">
+      <div class="intro-copy">
+        <p class="overline"><span class="small-line"></span> UN LIBRO FATTO D'AMORE <span class="small-line"></span></p>
+        <h1 id="book-title">Il libro di <em>Mattia</em></h1>
+        <p class="intro-quote">«Ci sono storie che iniziano prima ancora del primo incontro.»</p>
+        <div class="rule-heart" aria-hidden="true"><span></span> ♡ <span></span></div>
+        <p class="intro-description">Dalla dolce attesa alle prime scoperte. Un luogo speciale per custodire, pagina dopo pagina, i ricordi più preziosi della nostra famiglia.</p>
+        <div class="hero-actions"><a class="primary-btn" href="#chapters" id="open-book">Sfoglia il libro <span aria-hidden="true">↗</span></a></div>
+        <p class="intro-names">Con amore, mamma Angela e papà Marco.</p>
+      </div>
+      <div class="cover-wrap">
+        <div class="cover-shadow" aria-hidden="true"></div>
+        <img class="album-cover" src="assets/copertina.webp" width="1122" height="1402" alt="Copertina illustrata del libro di Mattia con orsetto, scarpine, fiori e oggetti per neonato, senza fotografie di persone">
+        <span class="cover-caption">IL NOSTRO PICCOLO UNIVERSO · 2026</span>
+      </div>
+    </section>
+
+    <section id="gate" class="gate-section" aria-labelledby="gate-title">
+      <div class="gate-icon" aria-hidden="true">✉</div>
+      <p class="overline">UN POSTO RISERVATO A CHI GLI VUOLE BENE</p>
+      <h2 id="gate-title">Le pagine più preziose <em>sono private.</em></h2>
+      <p class="muted">L'album è accessibile solo a Marco, Angela e alle persone che hanno invitato. Accedi con il tuo account Google oppure con un’email autorizzata. Ogni familiare deve avere un accesso personale.</p>
+      <button class="google-btn" id="google-login" type="button"><span class="google-g" aria-hidden="true">G</span> Continua con Google</button>
+      <p class="separator"><span>oppure usa l’email</span></p>
+      <form id="login-form" class="login-form" novalidate>
+        <label for="login-email">Il tuo indirizzo email</label>
+        <div class="input-action">
+          <input id="login-email" type="email" autocomplete="email" inputmode="email" placeholder="nome@esempio.it" required>
+          <button type="submit" class="primary-btn" id="login-submit">Invia link</button>
+        </div>
+      </form>
+      <form id="code-form" class="otp-form" novalidate>
+        <label for="login-code">Hai ricevuto un codice a 6 cifre? Puoi inserirlo qui.</label>
+        <div class="input-action">
+          <input id="login-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="000000">
+          <button type="submit" class="outline-btn" id="code-submit">Verifica codice</button>
+        </div>
+      </form>
+      <details class="password-options">
+        <summary>Hai già un account con password personale?</summary>
+        <form id="password-form" class="stack password-form">
+          <label>Indirizzo email<input id="password-email" type="email" autocomplete="username" required></label>
+          <label>Password personale<input id="password-value" type="password" autocomplete="current-password" required></label>
+          <button class="outline-btn" type="submit" id="password-submit">Accedi con password</button>
+        </form>
+      </details>
+      <p id="auth-message" class="status" role="status" aria-live="polite"></p>
+      <p class="tiny-note">L'accesso tramite email non garantisce il permesso: serve anche un invito attivo da parte dei genitori.</p>
+    </section>
+
+    <section id="denied" class="notice-box" hidden aria-live="polite">
+      <div class="gate-icon" aria-hidden="true">♡</div>
+      <h2>Questo libro è riservato.</h2>
+      <p>Hai effettuato l'accesso come <strong id="denied-email"></strong>, ma non risulti nell'elenco degli invitati. Puoi chiedere a Marco o Angela di aggiungere il tuo indirizzo.</p>
+      <button type="button" id="denied-logout" class="outline-btn">Accedi con un'altra email</button>
+    </section>
+
+    <div id="private-content" hidden>
+      <section class="welcome-strip" aria-label="Benvenuto nell'album">
+        <span class="welcome-icon" aria-hidden="true">♡</span>
+        <p><strong id="welcome-name">Benvenuto</strong>, questo piccolo mondo ti aspettava.</p>
+        <span id="role-label" class="role-tag">Invitato</span>
+      </section>
+      <section id="chapters" class="chapter-section" aria-labelledby="chapters-title">
+        <p class="overline">IL NOSTRO RACCONTO</p>
+        <h2 id="chapters-title">Ogni ricordo è <em>una pagina.</em></h2>
+        <p class="section-lead">Seleziona un capitolo per sfogliare le fotografie, i pensieri e i momenti che abbiamo raccolto.</p>
+        <div class="chapter-grid" id="chapter-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="memory-section" class="memories-section" aria-labelledby="selected-title" hidden>
+        <div class="chapter-heading">
+          <div><p class="overline" id="selected-number">CAPITOLO</p><h2 id="selected-title"></h2><p id="selected-intro" class="section-lead"></p></div>
+          <button type="button" id="back-chapters" class="text-btn">← Tutti i capitoli</button>
+        </div>
+        <div id="memories-list" class="memories-list" aria-live="polite"></div>
+        <nav class="page-nav" id="page-nav" aria-label="Sfoglia le pagine" hidden>
+          <button type="button" id="prev-page" class="outline-btn">← Precedente</button>
+          <span id="page-count" class="page-count">Pagina 1 di 1</span>
+          <button type="button" id="next-page" class="outline-btn">Successiva →</button>
+        </nav>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer"><span>Fat‌to con amore, per Mattia.</span><span>Marco · Angela · Mattia</span></footer>
+
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Visualizzazione fotografia o video">
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Chiudi">×</button>
+    <div id="lightbox-media" class="lightbox-content"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/album.js"></script>
+</body>
+</html>

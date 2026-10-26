@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f2e9">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="book-base" content="../">
+  <title>Gestione privata — Il libro di Mattia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Vai al contenuto</a>
+  <header class="topbar">
+    <a class="home-link" href="../">← Torna al libro</a>
+    <a class="brand" href="../">m <span aria-hidden="true">♡</span> a</a>
+    <nav class="nav-actions"><button id="logout-button" class="ghost" type="button" hidden>Esci</button></nav>
+  </header>
+  <main id="main" class="site-container admin-layout">
+    <div class="admin-heading">
+      <p class="overline">SOLO PER LA FAMIGLIA</p>
+      <h1>La stanza dei <em>ricordi.</em></h1>
+      <p class="section-lead">Qui potete scrivere nuove pagine, aggiungere foto e scegliere chi potrà leggere il vostro libro.</p>
+    </div>
+
+    <section id="gate" class="gate-section" aria-labelledby="gate-title">
+      <p class="overline">ACCESSO RISERVATO</p><h2 id="gate-title">Entra nel <em>tuo album.</em></h2>
+      <button class="google-btn" id="google-login" type="button"><span class="google-g" aria-hidden="true">G</span> Continua con Google</button>
+      <p class="separator"><span>oppure usa l’email</span></p>
+      <form id="login-form" class="login-form">
+        <label for="login-email">Indirizzo email autorizzato</label>
+        <div class="input-action"><input id="login-email" type="email" autocomplete="email" required placeholder="nome@esempio.it"><button class="primary-btn" id="login-submit" type="submit">Invia link</button></div>
+      </form>
+      <form id="code-form" class="otp-form">
+        <label for="login-code">Oppure inserisci il codice ricevuto via email</label>
+        <div class="input-action"><input id="login-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="000000"><button class="outline-btn" type="submit" id="code-submit">Verifica codice</button></div>
+      </form>
+      <details class="password-options">
+        <summary>Hai già un account con password personale?</summary>
+        <form id="password-form" class="stack password-form">
+          <label>Indirizzo email<input id="password-email" type="email" autocomplete="username" required></label>
+          <label>Password personale<input id="password-value" type="password" autocomplete="current-password" required></label>
+          <button class="outline-btn" type="submit" id="password-submit">Accedi con password</button>
+        </form>
+      </details>
+      <p id="auth-message" class="status" aria-live="polite" role="status"></p>
+    </section>
+    <section id="denied" class="notice-box" hidden><h2>Accesso non autorizzato</h2><p>Questa area è riservata ai proprietari e ai collaboratori autorizzati. Account: <strong id="denied-email"></strong></p><button class="outline-btn" id="denied-logout" type="button">Cambia account</button></section>
+
+    <div id="private-content" hidden>
+      <div class="admin-status"><span>Accesso attivo come <strong id="welcome-name"></strong></span><span class="role-tag" id="role-label"></span></div>
+      <section class="panel" aria-labelledby="memory-form-title">
+        <div class="panel-head"><span class="panel-symbol" aria-hidden="true">✎</span><div><p class="overline">UNA NUOVA PAGINA</p><h2 id="memory-form-title">Aggiungi un ricordo</h2></div></div>
+        <form id="memory-form" class="stack" novalidate>
+          <div class="form-grid">
+            <label>Capitolo
+              <select id="memory-chapter" required></select>
+            </label>
+            <label>Data del ricordo
+              <input id="memory-date" type="date" required>
+            </label>
+          </div>
+          <label>Un titolo per questo momento
+            <input id="memory-title" type="text" maxlength="160" required placeholder="Il primo abbraccio, una giornata speciale…">
+          </label>
+          <label>Raccontalo con le tue parole
+            <textarea id="memory-body" maxlength="12000" rows="5" placeholder="Caro Mattia, oggi…"></textarea>
+          </label>
+          <label>Aggiungi fotografie o piccoli video (facoltativo)
+            <input id="memory-files" type="file" accept="image/*,video/mp4,video/quicktime" multiple>
+            <small class="muted">Le foto verranno ottimizzate; per i video massimo 20 MB a file. Nessuna foto finisce nel repository pubblico.</small>
+          </label>
+          <div id="existing-media" class="existing-media" hidden></div>
+          <p id="memory-status" class="status" role="status" aria-live="polite"></p>
+          <div class="button-row"><button class="primary-btn" id="memory-submit" type="submit">Salva il ricordo</button><button class="outline-btn" id="cancel-edit" type="button" hidden>Annulla modifica</button></div>
+        </form>
+      </section>
+      <section class="panel" aria-labelledby="manage-memories-title">
+        <div class="panel-head"><span class="panel-symbol" aria-hidden="true">✧</span><div><p class="overline">PAGINE SCRITTE</p><h2 id="manage-memories-title">I ricordi salvati</h2></div></div>
+        <div id="admin-memory-list" class="admin-memory-list"></div>
+      </section>
+      <section id="owner-only" hidden>
+        <section id="private-board" class="panel" hidden aria-labelledby="private-board-title">
+          <div class="panel-head"><span class="panel-symbol" aria-hidden="true">✉</span><div><p class="overline">SOLO MARCO E ANGELA</p><h2 id="private-board-title">Bacheca privata</h2></div></div>
+          <p class="muted">Le dediche e le fotografie inviate dal sito sono visibili soltanto a voi due.</p>
+          <p id="private-board-status" class="status" role="status" aria-live="polite"></p>
+          <div id="private-board-list" class="private-board-list"></div>
+        </section>
+        <div class="two-panel-grid">
+          <section class="panel" aria-labelledby="invite-title">
+            <div class="panel-head"><span class="panel-symbol" aria-hidden="true">♡</span><div><p class="overline">LA FAMIGLIA</p><h2 id="invite-title">Chi può entrare</h2></div></div>
+            <form id="invite-form" class="stack">
+              <label>Indirizzo email dell'invitato<input id="invite-email" type="email" autocomplete="off" required placeholder="nonna@esempio.it"></label>
+              <label>Nome (facoltativo)<input id="invite-name" type="text" maxlength="80" placeholder="Nonna Maria"></label>
+              <label>Permessi<select id="invite-role"><option value="viewer">Può sfogliare il libro</option><option value="contributor">Può anche aggiungere ricordi</option></select></label>
+              <p class="tiny-note">L'indirizzo viene autorizzato, ma non viene spedita automaticamente un'email: condividi il link al libro e l'invitato potrà richiedere il suo codice.</p>
+              <div class="button-row"><button class="primary-btn" id="invite-submit" type="submit">Autorizza persona</button><button class="outline-btn" id="copy-invite-link" type="button">Copia link album</button></div>
+              <p id="invite-status" class="status" role="status" aria-live="polite"></p>
+            </form>
+            <div id="invites-list" class="invites-list"></div>
+          </section>
+          <section class="panel" aria-labelledby="chapter-control-title">
+            <div class="panel-head"><span class="panel-symbol" aria-hidden="true">❀</span><div><p class="overline">IL LIBRO CRESCE</p><h2 id="chapter-control-title">Apri i capitoli</h2></div></div>
+            <p class="muted">Prima della nascita è aperto solo il capitolo dell'attesa. Quando vorrete, potrete rendere visibili i successivi capitoli ai familiari.</p>
+            <div id="chapter-visibility-list" class="chapter-visibility-list"></div>
+            <p id="chapter-status" class="status" role="status" aria-live="polite"></p>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer"><span>La nostra storia, una pagina alla volta.</span><span>Marco · Angela · Mattia</span></footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="../assets/config.js"></script>
+  <script src="../assets/common.js"></script>
+  <script src="../assets/admin.js"></script>
+</body>
+</html>

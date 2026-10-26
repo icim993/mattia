@@ -242,11 +242,21 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
     </div>
   </section>
 
+
+  <!-- MATTIA_PRIVATE_ALBUM_V1 -->
+  <section id="libro-privato" aria-labelledby="libro-privato-title">
+    <p class="eyebrow">Il nostro album di famiglia</p>
+    <h2 id="libro-privato-title">Il libro di Mattia</h2>
+    <p class="lead">Una storia fatta di ricordi, parole e fotografie autentiche.
+       L'album è riservato a Marco, Angela e alle persone invitate da loro.</p>
+    <div class="btns"><a class="btn" href="./libro/">Apri il libro privato ♡</a></div>
+  </section>
+
   <!-- Guestbook -->
   <section id="messaggi">
     <p class="eyebrow">Guestbook</p>
     <h2>Un messaggio per Mattia</h2>
-    <p class="lead">Scrivi due righe che Mattia leggerà da grande. Puoi aggiungere una foto dal telefono e una canzone per la sua playlist.</p>
+    <p class="lead">Scrivi due righe che Mattia leggerà da grande. Puoi aggiungere una foto dal telefono e una canzone per la sua playlist. Testi e fotografie sono privati e visibili solo ai genitori, Marco e Angela. Nomi e canzoni restano nella playlist pubblica.</p>
     <form class="panel" id="msg-form" novalidate>
       <label for="msg-name">Il tuo nome<input id="msg-name" autocomplete="name" maxlength="40"></label>
       <label for="msg-text">Il messaggio<textarea id="msg-text" maxlength="1200" placeholder="Caro Mattia…"></textarea></label>
@@ -256,7 +266,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
       <p class="err" id="msg-err" role="alert"></p>
       <div class="btns"><button class="btn" type="submit" id="msg-btn">Lascia il messaggio</button><span class="ok" id="msg-ok" role="status"></span></div>
     </form>
-    <div id="notes"><div class="empty">Caricamento dei messaggi…</div></div>
+    <div id="notes" hidden aria-hidden="true"></div>
   </section>
 
   <!-- Playlist -->
@@ -422,7 +432,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
       var r = await Promise.all([
         sb.from('info').select('*').eq('id',1).maybeSingle(),
         sb.from('bets').select('*').order('created_at',{ascending:true}),
-        sb.from('messages').select('*').order('created_at',{ascending:true})
+        sb.from('messages').select('nome,canzone,created_at').order('created_at',{ascending:true})
       ]);
       if (r[0].error || r[1].error || r[2].error) throw (r[0].error || r[1].error || r[2].error);
       S.info = r[0].data; S.bets = r[1].data || []; S.msgs = r[2].data || [];
