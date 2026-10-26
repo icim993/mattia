@@ -151,6 +151,8 @@ tr.fresh td{background:color-mix(in srgb,var(--sun) 18%,transparent)}
 
 .banner{border:1.5px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px 14px;font-size:.92rem}
 footer{color:var(--muted);font-size:.85rem;text-align:center}
+.footer-album{display:inline-block;margin-top:10px;color:var(--muted);font-size:.78rem;text-decoration:none;text-underline-offset:3px;transition:color .18s ease}
+.footer-album:hover{color:var(--ink);text-decoration:underline}
 @media (prefers-reduced-motion: reduce){.tag{transform:none}.live .dot{animation:none}}
 </style>
 
@@ -242,16 +244,6 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
     </div>
   </section>
 
-
-  <!-- MATTIA_PRIVATE_ALBUM_V1 -->
-  <section id="libro-privato" aria-labelledby="libro-privato-title">
-    <p class="eyebrow">Il nostro album di famiglia</p>
-    <h2 id="libro-privato-title">Il libro di Mattia</h2>
-    <p class="lead">Una storia fatta di ricordi, parole e fotografie autentiche.
-       L'album è riservato a Marco, Angela e alle persone invitate da loro.</p>
-    <div class="btns"><a class="btn" href="./libro/">Apri il libro privato ♡</a></div>
-  </section>
-
   <!-- Guestbook -->
   <section id="messaggi">
     <p class="eyebrow">Guestbook</p>
@@ -277,7 +269,10 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
     <div id="songs"></div>
   </section>
 
-  <footer>Con tanto affetto da Marco e Angela</footer>
+  <footer>Con tanto affetto da Marco e Angela
+    <!-- MATTIA_PRIVATE_ALBUM_V1 -->
+    <div><a class="footer-album" href="./libro/">♡ Il libro di Mattia · Album privato</a></div>
+  </footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>

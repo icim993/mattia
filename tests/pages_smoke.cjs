@@ -17,10 +17,14 @@ const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
   res.end(fs.readFileSync(file));
 });
-function mock({role=null, signedIn=false, born=false, unavailable=false, boardError=false}) {
+function mock({role=null, signedIn=false, born=false, unavailable=false, boardError=false, passwordRole='viewer'}) {
   window.testCalls = [];
   window.testWrites = [];
   window.testDownloads = [];
+  Object.defineProperty(navigator,'clipboard',{value:{writeText:async text=>{
+    if(window.testClipboardFail) throw Error('Clipboard denied');
+    window.testClipboardText=text;
+  }},configurable:true});
   const chapters = [{id:1,title:'Prima di te',slug:'prima-di-te',subtitle:'Attesa',introduction:'Una storia',visible:true},
     ...(role==='owner' ? [{id:2,title:'Benvenuto al mondo',slug:'benvenuto',visible:false}] : [])];
   const rows = {
@@ -35,16 +39,20 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
     album_memories:[{id:'m1',chapter_id:1,title:'Ricordo di prova',body:'Testo di prova',memory_date:'2026-10-26',created_by:'u1'}],
     album_media:[], album_access:[{email:'owner@example.test',role:'owner',display_name:'Test',active:true}]
   };
-  window.supabase = {createClient:()=>({
+  window.supabase = {createClient:(url,key,options)=>{window.testClientOptions=options;return {
     auth:{getSession:async()=>({data:{session:signedIn?{}:null}}),
       getUser:async()=>({data:{user:signedIn?{id:'u1',email:'owner@example.test'}:null}}),
       onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),
+      signInWithPassword:async({email})=>{signedIn=true;role=passwordRole;window.testPasswordEmail=email;return {error:null}},
       signOut:async()=>{signedIn=false;return {error:null}}},
     rpc:async()=>({data:role,error:unavailable?{message:'Missing migration'}:null}),
     from:table=>{
       window.testCalls.push(table);
       let result = {data:rows[table]??[],error:table==='guestbook_private' && boardError ? {message:'Unavailable'} : null};
-      const q = {select(){return q},eq(){return q},order(){return q},
+      let patch=null;
+      const q = {select(){return q},eq(column,value){if(patch){for(const row of rows[table]||[])if(row[column]===value)Object.assign(row,patch)}return q},order(){return q},
+        update(row){patch=row;window.testWrites.push({table,row});return q},
+        upsert(row){const existing=rows[table].find(item=>item.email===row.email);if(existing)Object.assign(existing,row);else rows[table].push(row);window.testWrites.push({table,row});return q},
         insert(row){window.testWrites.push({table,row});result={data:{id:'m2',...row},error:null};return q},
         maybeSingle(){return Promise.resolve(result)},
         single(){return Promise.resolve({...result,data:Array.isArray(result.data)?result.data[0]:result.data})},
@@ -55,7 +63,7 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
       upload:async(path,blob)=>{window.testWrites.push({bucket,path,size:blob.size});return {error:null}},
       getPublicUrl:path=>({data:{publicUrl:'https://example.supabase.co/storage/v1/object/public/foto/'+path}})
     })}
-  })};
+  }}};
 }
 (async()=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -76,6 +84,8 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
         {name:'owner-admin',route:'libro/admin/',signedIn:true,role:'owner'},
         {name:'owner-board-error',route:'libro/admin/',signedIn:true,role:'owner',boardError:true},
         {name:'anonymous-admin',route:'libro/admin/'},
+        {name:'password-login',route:'libro/'},
+        {name:'password-login-admin',route:'libro/admin/',passwordRole:'contributor'},
         {name:'missing-migration',route:'libro/',signedIn:true,unavailable:true}
       ]) {
         const context = await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
@@ -119,13 +129,26 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
           assert.equal(writes.some(x=>x.bucket==='foto' && x.size>0),true);
           assert.equal(writes.some(x=>x.table==='messages' && x.row.testo==='Dedica privata di prova' && x.row.foto.includes('/foto/')),true);
           assert.match(await page.locator('#songs a').getAttribute('href'),/^https:\/\/open.spotify.com\/search\//);
-          await page.getByRole('link',{name:'Apri il libro privato'}).click();
+          assert.equal(await page.locator('#libro-privato').count(),0);
+          await page.locator('footer').getByRole('link',{name:'♡ Il libro di Mattia · Album privato'}).click();
           assert.equal(page.url(),base+'libro/');
         } else if (!scenario.signedIn || scenario.unavailable) {
           await page.locator('#gate').waitFor();
           assert.equal(await page.locator('#private-content').isVisible(),false);
           assert.deepEqual(await page.evaluate(()=>window.testCalls),[]);
           if (scenario.unavailable) assert.match(await page.locator('#auth-message').innerText(),/Impossibile verificare/);
+          assert.equal(await page.locator('#password-email').isVisible(),true);
+          assert.equal(await page.locator('#password-value').getAttribute('autocomplete'),'current-password');
+          assert.equal(await page.locator('#password-email').getAttribute('autocomplete'),'username');
+          if (scenario.name.startsWith('password-login')) {
+            await page.locator('#password-email').fill('viewer@example.test');
+            await page.locator('#password-value').fill('mock-password-for-test');
+            await page.locator('#password-submit').click();
+            await page.locator('#private-content').waitFor();
+            assert.equal(await page.locator('#password-value').inputValue(),'');
+            assert.equal(await page.evaluate(()=>window.testPasswordEmail),'viewer@example.test');
+            assert.equal(await page.locator('#private-board').isVisible().catch(()=>false),false);
+          }
         } else if (!scenario.role || scenario.name==='viewer-admin') {
           await page.locator('#denied').waitFor();
           assert.equal(await page.locator('#private-content').isVisible(),false);
@@ -161,10 +184,41 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
           await page.locator('#memory-submit').click();
           await page.waitForFunction(()=>document.querySelector('#memory-status').textContent.includes('Ricordo salvato'));
           assert.equal((await page.evaluate(()=>window.testWrites)).some(x=>x.table==='album_memories'),true);
+          if (scenario.role==='owner') {
+            assert.equal(await page.locator('#copy-whatsapp-invite').isDisabled(),true);
+            for (const inviteRole of ['viewer','contributor']) {
+              await page.locator('#invite-email').fill('nonna@example.test');
+              await page.locator('#invite-name').fill('Nonna');
+              await page.locator('#invite-role').selectOption(inviteRole);
+              await page.locator('#invite-submit').click();
+              await page.waitForFunction(()=>document.querySelector('#invite-status').textContent.includes('Email autorizzata:'));
+              await page.locator('#copy-whatsapp-invite').click();
+              await page.waitForFunction(()=>window.testClipboardText?.includes('nonna@example.test'));
+              const text=await page.evaluate(()=>window.testClipboardText);
+              assert.match(text,/stessa email/);assert.ok(text.includes(base+'libro/'));
+              assert.equal(text.includes('aggiungere i tuoi ricordi'),inviteRole==='contributor');
+            }
+            await page.evaluate(()=>{window.testClipboardFail=true});
+            await page.locator('#copy-whatsapp-invite').click();
+            await page.locator('#invite-copy-fallback').waitFor();
+            assert.match(await page.locator('#invite-copy-text').inputValue(),/nonna@example.test/);
+            page.on('dialog',dialog=>dialog.accept());
+            const invite=page.locator('.invite-item').filter({hasText:'nonna@example.test'});
+            await invite.getByRole('button',{name:'Revoca',exact:true}).click();
+            await invite.getByRole('button',{name:'Riattiva',exact:true}).waitFor();
+            assert.equal(await page.locator('#copy-whatsapp-invite').isDisabled(),true);
+            await invite.getByRole('button',{name:'Riattiva',exact:true}).click();
+            await invite.getByRole('button',{name:'Revoca',exact:true}).waitFor();
+            assert.equal(await page.locator('#copy-whatsapp-invite').isDisabled(),false);
+          }
         }
         const canReadBoard = scenario.role==='owner' && page.url().endsWith('/libro/admin/');
         assert.equal((await page.evaluate(()=>window.testCalls)).includes('guestbook_private'),canReadBoard);
         if (!canReadBoard) assert.deepEqual(await page.evaluate(()=>window.testDownloads),[]);
+        if (scenario.route) {
+          assert.equal(await page.evaluate(()=>window.testClientOptions.auth.persistSession),true);
+          assert.equal(await page.evaluate(()=>window.testClientOptions.auth.autoRefreshToken),true);
+        }
         if (canReadBoard) {
           await page.locator('#logout-button').click();
           assert.equal(await page.locator('#private-board').isVisible(),false);
@@ -187,6 +241,6 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
       }
     }
     assert.deepEqual(missing,[]);
-    console.log('PASS: 24 browser scenarios, private board/download/logout, public submissions, album writes and Pages paths; no real database requests.');
+    console.log('PASS: 28 browser scenarios; password login/session restore, WhatsApp invites/clipboard fallback/revoke/reactivate, privacy, public forms and Pages paths.');
   } finally {if(browser) await browser.close();server.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

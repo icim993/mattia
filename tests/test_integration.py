@@ -9,19 +9,32 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 
 class IntegrationTests(unittest.TestCase):
-    def test_existing_home_changes_only_album_link_and_requested_privacy(self):
+    def test_public_logic_unchanged_and_album_link_only_in_footer(self):
         original = subprocess.check_output([
-            'git', '-c', f'safe.directory={ROOT.as_posix()}', 'show', 'f164866:index.html'
+            'git', '-c', f'safe.directory={ROOT.as_posix()}', 'show', '857d164:index.html'
         ], cwd=ROOT).decode().replace('\r\n', '\n')
         installed = (ROOT/'index.html').read_text(encoding='utf-8')
-        installed = installed.replace(' Testi e fotografie sono privati e visibili solo ai genitori, Marco e Angela. Nomi e canzoni restano nella playlist pubblica.', '')
-        installed = installed.replace('<div id="notes" hidden aria-hidden="true"></div>', '<div id="notes"><div class="empty">Caricamento dei messaggi…</div></div>')
-        installed = installed.replace("sb.from('messages').select('nome,canzone,created_at')", "sb.from('messages').select('*')")
-        restored, count = re.subn(
-            r'\n\n  <!-- MATTIA_PRIVATE_ALBUM_V1 -->.*?</section>\n\n(?=  <!-- Guestbook -->)',
-            '\n', installed, count=1, flags=re.S)
-        self.assertEqual(count, 1)
-        self.assertEqual(restored, original)
+        self.assertEqual(re.findall(r'<script\b.*?</script>',installed,re.S), re.findall(r'<script\b.*?</script>',original,re.S))
+        self.assertNotIn('id="libro-privato"',installed)
+        self.assertEqual(installed.count('href="./libro/"'),1)
+        footer = re.search(r'<footer>.*?</footer>',installed,re.S)[0]
+        self.assertIn('Con tanto affetto da Marco e Angela',footer)
+        self.assertIn('♡ Il libro di Mattia · Album privato',footer)
+        self.assertIn('href="./libro/"',footer)
+        self.assertIn('id="notes" hidden aria-hidden="true"',installed)
+
+    def test_session_settings_and_password_manager_fields(self):
+        common = (ROOT/'libro/assets/common.js').read_text(encoding='utf-8')
+        self.assertIn('persistSession: true',common)
+        self.assertIn('autoRefreshToken: true',common)
+        for rel in ['libro/index.html','libro/admin/index.html']:
+            html=(ROOT/rel).read_text(encoding='utf-8')
+            self.assertIn('autocomplete="username"',html)
+            self.assertIn('autocomplete="current-password"',html)
+            self.assertLess(html.index('id="password-form"'),html.index('id="google-login"'))
+            self.assertNotIn('password-options',html)
+        for file in (ROOT/'libro/assets').glob('*.js'):
+            self.assertNotRegex(file.read_text(encoding='utf-8'),r'localStorage\.setItem|document\.cookie\s*=')
 
     def test_config_reuses_existing_public_values(self):
         home = (ROOT/'index.html').read_text(encoding='utf-8')

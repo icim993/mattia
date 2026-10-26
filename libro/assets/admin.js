@@ -4,9 +4,14 @@
   const M = window.Mattia, $ = M.$, n = M.node;
   const data = { chapters: [], memories: [], media: [], access: [], editingId: null };
   const canEditMemory = memory => M.ctx.role === 'owner' || (M.ctx.role === 'contributor' && memory.created_by === M.ctx.user?.id);
+  let lastInvitedEmail = null;
   let boardVersion = 0;
   const boardPhotoUrls = new Set();
   function clearPrivateBoard() {
+    lastInvitedEmail = null;
+    $('copy-whatsapp-invite').disabled = true;
+    $('invite-copy-text').value = '';
+    $('invite-copy-fallback').hidden = true;
     ++boardVersion;
     $('private-board').hidden = true;
     M.empty($('private-board-list'));
@@ -262,6 +267,8 @@
 
   function renderInvites() {
     const box = $('invites-list'); M.empty(box);
+    const last = data.access.find(person => person.email === lastInvitedEmail && person.active);
+    $('copy-whatsapp-invite').disabled = M.ctx.role !== 'owner' || !last;
     if (M.ctx.role !== 'owner') return;
     const label = n('p','overline','PERSONE AUTORIZZATE'); label.style.marginTop='26px'; box.appendChild(label);
     for (const person of data.access) {
@@ -270,8 +277,13 @@
       copy.appendChild(n('div','item-sub',`${person.email} · ${person.role==='owner'?'Genitore':person.role==='contributor'?'Collaboratore':'Lettore'} · ${person.active?'Attivo':'Revocato'}`));
       line.appendChild(copy);
       if (person.role !== 'owner') {
+        const actions = n('div', 'item-actions');
+        if (person.active) {
+          const copyInvite = n('button', 'small-btn', 'Copia invito WhatsApp'); copyInvite.type='button';
+          copyInvite.addEventListener('click', () => copyWhatsAppInvite(person)); actions.appendChild(copyInvite);
+        }
         const btn=n('button',person.active?'small-btn danger':'small-btn',person.active?'Revoca':'Riattiva'); btn.type='button';
-        btn.addEventListener('click',()=>setInviteActive(person,!person.active)); line.appendChild(btn);
+        btn.addEventListener('click',()=>setInviteActive(person,!person.active)); actions.appendChild(btn); line.appendChild(actions);
       }
       box.appendChild(line);
     }
@@ -296,14 +308,33 @@
     try {
       const res=await M.sb.from('album_access').upsert({email,display_name:displayName,role,active:true,created_by:M.ctx.user.id},{onConflict:'email'});
       if (res.error) throw res.error;
+      lastInvitedEmail = email;
       $('invite-form').reset(); await loadAll();
-      message('invite-status',`Email autorizzata. Ora invia il link ${M.bookBase.href} alla persona. Non è stata spedita automaticamente un'email.`,'ok');
+      message('invite-status',`Email autorizzata: ${email}. Ora copia l'invito WhatsApp e condividilo. Non è stata inviata alcuna email.`,'ok');
     } catch(error) {message('invite-status',M.readableError(error),'error');}
     finally {button.disabled=false;}
   });
   $('copy-invite-link').addEventListener('click',async()=>{
     try {await navigator.clipboard.writeText(M.bookBase.href);message('invite-status','Link copiato: puoi inviarlo su WhatsApp.','ok');}
     catch {message('invite-status','Copia questo indirizzo: '+M.bookBase.href,'ok');}
+  });
+  async function copyWhatsAppInvite(person) {
+    if (M.ctx.role !== 'owner' || !data.access.some(p => p.email === person?.email && p.active && p.role !== 'owner')) return;
+    const text = `Ciao${person.display_name ? ' ' + person.display_name : ''}! ♡ Ti invitiamo nel libro di Mattia: ${M.bookBase.href}\n\nAccedi usando la stessa email che abbiamo autorizzato: ${person.email}. ${person.role === 'contributor' ? 'Puoi sfogliare i capitoli aperti e aggiungere i tuoi ricordi.' : 'Puoi sfogliare i capitoli che apriremo alla famiglia.'}\n\nCon amore, Marco e Angela`;
+    $('invite-copy-fallback').hidden = true;
+    $('invite-copy-text').value = '';
+    try {
+      await navigator.clipboard.writeText(text);
+      message('invite-status', 'Invito copiato. Incollalo su WhatsApp e invialo tu alla persona. Nessuna email è stata inviata.', 'ok');
+    } catch {
+      if (M.ctx.role !== 'owner') return;
+      $('invite-copy-text').value = text;
+      $('invite-copy-fallback').hidden = false;
+      message('invite-status', 'Copia il testo qui sotto e condividilo su WhatsApp. Nessun messaggio è stato inviato automaticamente.');
+    }
+  }
+  $('copy-whatsapp-invite').addEventListener('click', () => {
+    copyWhatsAppInvite(data.access.find(person => person.email === lastInvitedEmail));
   });
   function renderChapterVisibility() {
     const box=$('chapter-visibility-list'); M.empty(box);

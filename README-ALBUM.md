@@ -1,5 +1,13 @@
 # Il libro di Mattia — integrazione V1
 
+## Accesso rapido e inviti
+
+Il collegamento pubblico all'album è nel footer della home: `♡ Il libro di Mattia · Album privato`, con percorso relativo `./libro/`. L'accesso email/password è subito visibile nel libro e nell'amministrazione. La sessione e il refresh dei token restano gestiti da Supabase; il sito non salva password e mantiene i campi compatibili con il gestore password del browser. Google, link email e OTP restano disponibili.
+
+In “Chi può entrare”, i genitori inseriscono email/nome, scelgono lettore o collaboratore, autorizzano e condividono l'invito. “Copia invito WhatsApp” prepara un testo con l'URL dell'album e l'email esatta da utilizzare: non invia messaggi o email. È disponibile anche accanto agli invitati attivi. Se il browser nega gli appunti, il testo resta copiabile manualmente. Revoca e riattivazione restano disponibili. Solo gli owner accedono alla bacheca privata; i familiari vedono i capitoli aperti dai genitori.
+
+Verifiche dell'aggiornamento: 13 test Python e 28 scenari browser desktop/mobile, inclusi ripristino della sessione, accesso con password, copia invito per entrambi i ruoli, appunti non disponibili, revoca e riattivazione. Nessuna modifica SQL.
+
 ## Aggiornamento privacy — 26 ottobre 2026
 
 Il progetto Supabase esistente è già stato aggiornato dal proprietario: **non eseguire nuovamente SQL o migrazioni**. Le istruzioni SQL più sotto restano come riferimento per installazioni nuove. `messages` è ora una vista pubblica per nomi/canzoni e invio dediche; testo e foto restano NULL nelle letture pubbliche. `guestbook_private` è la fonte originale accessibile solo agli owner. Entrambi i bucket `foto` e `mattia-album` sono privati.

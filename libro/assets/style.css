@@ -199,7 +199,6 @@ textarea{min-height:125px;resize:vertical;line-height:1.7}
 .google-g{display:grid;place-items:center;border:1px solid #dadada;width:23px;height:23px;border-radius:50%;font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#4285f4}
 .separator{max-width:550px;display:flex;align-items:center;gap:14px;text-align:center;margin:3px auto 17px;color:#a0968b;font-size:11px}
 .separator::before,.separator::after{content:'';height:1px;background:var(--line);flex:1}
-.password-options{max-width:550px;text-align:left;margin:19px auto 11px;font-size:12px;color:var(--sub)}
-.password-options summary{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.password-form{padding:14px 0 0}
-.password-form .outline-btn{justify-self:start}
+.password-form{max-width:550px;margin:22px auto 0;text-align:left}
+.password-form .primary-btn{justify-self:start}
+.session-note{max-width:550px;margin:14px auto 24px}

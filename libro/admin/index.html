@@ -28,6 +28,13 @@
 
     <section id="gate" class="gate-section" aria-labelledby="gate-title">
       <p class="overline">ACCESSO RISERVATO</p><h2 id="gate-title">Entra nel <em>tuo album.</em></h2>
+      <form id="password-form" class="stack password-form">
+        <label>Email autorizzata<input id="password-email" name="username" type="email" autocomplete="username" required></label>
+        <label>Password personale<input id="password-value" name="password" type="password" autocomplete="current-password" required></label>
+        <button class="primary-btn" type="submit" id="password-submit">Accedi</button>
+      </form>
+      <p class="tiny-note session-note">Sul tuo dispositivo personale puoi rimanere connesso e usare il gestore password del browser. Su un dispositivo condiviso, esci al termine.</p>
+      <p class="separator"><span>oppure</span></p>
       <button class="google-btn" id="google-login" type="button"><span class="google-g" aria-hidden="true">G</span> Continua con Google</button>
       <p class="separator"><span>oppure usa l’email</span></p>
       <form id="login-form" class="login-form">
@@ -38,14 +45,6 @@
         <label for="login-code">Oppure inserisci il codice ricevuto via email</label>
         <div class="input-action"><input id="login-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="000000"><button class="outline-btn" type="submit" id="code-submit">Verifica codice</button></div>
       </form>
-      <details class="password-options">
-        <summary>Hai già un account con password personale?</summary>
-        <form id="password-form" class="stack password-form">
-          <label>Indirizzo email<input id="password-email" type="email" autocomplete="username" required></label>
-          <label>Password personale<input id="password-value" type="password" autocomplete="current-password" required></label>
-          <button class="outline-btn" type="submit" id="password-submit">Accedi con password</button>
-        </form>
-      </details>
       <p id="auth-message" class="status" aria-live="polite" role="status"></p>
     </section>
     <section id="denied" class="notice-box" hidden><h2>Accesso non autorizzato</h2><p>Questa area è riservata ai proprietari e ai collaboratori autorizzati. Account: <strong id="denied-email"></strong></p><button class="outline-btn" id="denied-logout" type="button">Cambia account</button></section>
@@ -93,11 +92,13 @@
           <section class="panel" aria-labelledby="invite-title">
             <div class="panel-head"><span class="panel-symbol" aria-hidden="true">♡</span><div><p class="overline">LA FAMIGLIA</p><h2 id="invite-title">Chi può entrare</h2></div></div>
             <form id="invite-form" class="stack">
-              <label>Indirizzo email dell'invitato<input id="invite-email" type="email" autocomplete="off" required placeholder="nonna@esempio.it"></label>
+              <p class="muted">1. Inserisci email e nome. 2. Scegli i permessi e autorizza. 3. Copia l'invito e condividilo su WhatsApp.</p>
+              <label>Email da autorizzare<input id="invite-email" type="email" autocomplete="off" required placeholder="nonna@esempio.it"></label>
               <label>Nome (facoltativo)<input id="invite-name" type="text" maxlength="80" placeholder="Nonna Maria"></label>
-              <label>Permessi<select id="invite-role"><option value="viewer">Può sfogliare il libro</option><option value="contributor">Può anche aggiungere ricordi</option></select></label>
-              <p class="tiny-note">L'indirizzo viene autorizzato, ma non viene spedita automaticamente un'email: condividi il link al libro e l'invitato potrà richiedere il suo codice.</p>
-              <div class="button-row"><button class="primary-btn" id="invite-submit" type="submit">Autorizza persona</button><button class="outline-btn" id="copy-invite-link" type="button">Copia link album</button></div>
+              <label>Permessi<select id="invite-role"><option value="viewer">Lettore · sfoglia i capitoli aperti</option><option value="contributor">Collaboratore · aggiunge i propri ricordi</option></select></label>
+              <p class="tiny-note">Entrambi vedono soltanto i capitoli aperti ai familiari. Le dediche e le foto della bacheca privata restano riservate a Marco e Angela. L'autorizzazione non crea una password e non invia email: condividi l'invito personalmente.</p>
+              <div class="button-row"><button class="primary-btn" id="invite-submit" type="submit">Autorizza persona</button><button class="outline-btn" id="copy-invite-link" type="button">Copia link album</button><button class="outline-btn" id="copy-whatsapp-invite" type="button" disabled>Copia invito WhatsApp</button></div>
+              <label id="invite-copy-fallback" hidden>Invito da copiare<textarea id="invite-copy-text" rows="5" readonly></textarea></label>
               <p id="invite-status" class="status" role="status" aria-live="polite"></p>
             </form>
             <div id="invites-list" class="invites-list"></div>

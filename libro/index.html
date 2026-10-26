@@ -48,7 +48,14 @@
       <div class="gate-icon" aria-hidden="true">✉</div>
       <p class="overline">UN POSTO RISERVATO A CHI GLI VUOLE BENE</p>
       <h2 id="gate-title">Le pagine più preziose <em>sono private.</em></h2>
-      <p class="muted">L'album è accessibile solo a Marco, Angela e alle persone che hanno invitato. Accedi con il tuo account Google oppure con un’email autorizzata. Ogni familiare deve avere un accesso personale.</p>
+      <p class="muted">L'album è accessibile solo a Marco, Angela e alle persone che hanno invitato. Accedi con la tua email autorizzata e la password personale, se già configurata. Ogni familiare ha un accesso personale ai soli capitoli aperti dai genitori.</p>
+      <form id="password-form" class="stack password-form">
+        <label>Email autorizzata<input id="password-email" name="username" type="email" autocomplete="username" required></label>
+        <label>Password personale<input id="password-value" name="password" type="password" autocomplete="current-password" required></label>
+        <button class="primary-btn" type="submit" id="password-submit">Accedi</button>
+      </form>
+      <p class="tiny-note session-note">Sul tuo dispositivo personale puoi rimanere connesso e usare il gestore password del browser. Su un dispositivo condiviso, esci al termine.</p>
+      <p class="separator"><span>oppure</span></p>
       <button class="google-btn" id="google-login" type="button"><span class="google-g" aria-hidden="true">G</span> Continua con Google</button>
       <p class="separator"><span>oppure usa l’email</span></p>
       <form id="login-form" class="login-form" novalidate>
@@ -65,14 +72,6 @@
           <button type="submit" class="outline-btn" id="code-submit">Verifica codice</button>
         </div>
       </form>
-      <details class="password-options">
-        <summary>Hai già un account con password personale?</summary>
-        <form id="password-form" class="stack password-form">
-          <label>Indirizzo email<input id="password-email" type="email" autocomplete="username" required></label>
-          <label>Password personale<input id="password-value" type="password" autocomplete="current-password" required></label>
-          <button class="outline-btn" type="submit" id="password-submit">Accedi con password</button>
-        </form>
-      </details>
       <p id="auth-message" class="status" role="status" aria-live="polite"></p>
       <p class="tiny-note">L'accesso tramite email non garantisce il permesso: serve anche un invito attivo da parte dei genitori.</p>
     </section>
