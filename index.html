@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Toto-Mattia, guestbook e playlist per l'arrivo di Mattia.">
+<meta property="og:title" content="Mattia sta arrivando">
+<meta property="og:description" content="Scommetti su quando nasce e lasciagli un messaggio.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Arriva Mattia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una colonna stretta come un biglietto; il cartellino della culla è l'elemento firma, vuoto prima della nascita e compilato dopo. */
+:root{
+  --paper:#F5F8FC; --card:#FFFFFF; --ink:#1A2947; --muted:#5A6A86;
+  --sky:#8DB6E2; --sky-soft:#E2EDF9; --sun:#E9A62A; --line:#D2DCEA;
+  --good:#2F7D5B;
+  --f-display:"Caprasimo", "Cooper Black", Georgia, serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1525; --card:#152036; --ink:#E7EEF9; --muted:#9BABC6;
+  --sky:#7AA6D8; --sky-soft:#1B2945; --sun:#F2BC52; --line:#2A3A58; --good:#6CC79C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1525; --card:#152036; --ink:#E7EEF9; --muted:#9BABC6;
+  --sky:#7AA6D8; --sky-soft:#1B2945; --sun:#F2BC52; --line:#2A3A58; --good:#6CC79C; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2{font-family:var(--f-display);font-weight:400;line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.4rem,9vw,3.5rem)}
+h2{font-size:clamp(1.6rem,5.5vw,2rem)}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted);max-width:52ch}
+section{display:flex;flex-direction:column;gap:16px}
+
+/* Hero */
+.hero{display:flex;flex-direction:column;gap:22px}
+.hero .names{font-size:1.05rem;color:var(--muted)}
+.hero .names strong{color:var(--ink);font-weight:600}
+
+/* Cartellino della culla */
+.tag{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:18px;
+  padding:26px 22px 22px 58px;transform:rotate(-1.2deg);box-shadow:0 10px 30px -18px rgba(26,41,71,.45);max-width:520px}
+.tag::before{content:"";position:absolute;left:20px;top:24px;width:18px;height:18px;border-radius:50%;
+  background:var(--paper);border:1.5px solid var(--line)}
+.tag::after{content:"";position:absolute;left:28px;top:-26px;width:2px;height:52px;background:var(--sky);border-radius:2px;transform:rotate(14deg)}
+.tag-title{font-family:var(--f-display);font-size:1.7rem;line-height:1;margin-bottom:14px}
+.tag-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+.field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.field .k{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.field .v{font-family:var(--f-mono);font-size:1.15rem;font-weight:500;border-bottom:1.5px dashed var(--line);padding-bottom:3px;min-height:1.9rem;font-variant-numeric:tabular-nums}
+.field .v.blank{color:var(--muted);opacity:.7}
+.tag-photo{margin-top:16px;border-radius:12px;overflow:hidden;border:1.5px solid var(--line)}
+.tag-photo img{display:block;width:100%;height:auto}
+
+/* Form */
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:440px){.row{grid-template-columns:1fr}}
+label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.92rem;min-width:0}
+label small{font-weight:400;color:var(--muted)}
+input,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-width:0}
+input{font-family:var(--f-mono)}
+#bet-name,#msg-name,#msg-song{font-family:var(--f-body)}
+textarea{min-height:120px;resize:vertical;font-family:var(--f-body)}
+input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.err{color:#C0392B;font-size:.88rem;min-height:1.2em}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#FF8A7A}}
+:root[data-theme="dark"] .err{color:#FF8A7A}
+.btn{font:inherit;font-weight:700;border:0;border-radius:999px;padding:13px 22px;cursor:pointer;background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.wa{background:#1E8E57;color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.ready{display:flex;flex-direction:column;gap:12px;border-top:1.5px dashed var(--line);padding-top:16px}
+.ready pre{margin:0;white-space:pre-wrap;word-break:break-word;font-family:var(--f-mono);font-size:.88rem;background:var(--sky-soft);border-radius:10px;padding:12px}
+.hint{font-size:.88rem;color:var(--muted)}
+
+/* Regole */
+.rules{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:600px){.rules{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:400px){.rules{grid-template-columns:1fr}}
+.rule{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.rule .pts{font-family:var(--f-display);font-size:1.6rem;color:var(--sun);line-height:1}
+.rule .pts span{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.rule p{font-size:.88rem;color:var(--muted)}
+
+/* Tabelle */
+.tbl-wrap{overflow-x:auto;border:1.5px solid var(--line);border-radius:14px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+tr.first td{background:var(--sky-soft)}
+.medal{font-family:var(--f-display);color:var(--sun)}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);text-align:center}
+
+/* Guestbook */
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+@media (max-width:520px){.notes{grid-template-columns:1fr}}
+.note{background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.note img{display:block;width:100%;height:auto}
+.note .body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.note .who{font-weight:700}
+.note .when{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.note .txt{white-space:pre-wrap}
+
+/* Il giorno in cui sei nato */
+.day{background:var(--ink);color:var(--paper);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
+.day h2{color:var(--paper)}
+.day .eyebrow{color:var(--sky)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px}
+@media (max-width:440px){.facts{grid-template-columns:1fr}}
+.fact{display:flex;flex-direction:column;gap:3px;min-width:0;border-top:1px solid color-mix(in srgb,var(--paper) 25%,transparent);padding-top:10px}
+.fact .k{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sky)}
+.fact .v{font-weight:600}
+.fact .n{font-size:.88rem;opacity:.8}
+
+/* Stato in diretta */
+.live{display:flex;flex-direction:column;gap:4px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;max-width:520px}
+.live .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.live .dot{width:9px;height:9px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 55%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
+.live .txt{font-weight:700;font-size:1.08rem}
+
+/* Domande bonus */
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+legend{font-weight:600;font-size:.92rem;padding:0;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;position:relative;font-weight:500}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:inline-block;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.92rem}
+.chip input:checked + span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip input:focus-visible + span{outline:3px solid var(--sky);outline-offset:2px}
+
+/* Playlist */
+.songs{list-style:none;margin:0;padding:0;border:1.5px solid var(--line);border-radius:14px;background:var(--card)}
+.songs li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.songs li:last-child{border-bottom:0}
+.songs .num{font-family:var(--f-mono);color:var(--muted);min-width:2ch;font-variant-numeric:tabular-nums}
+.songs .meta{flex:1;min-width:0;display:flex;flex-direction:column}
+.songs .t{font-weight:600;overflow-wrap:anywhere}
+.songs .by{font-size:.85rem;color:var(--muted)}
+.songs a{font-weight:700;color:var(--ink);font-size:.88rem;white-space:nowrap}
+
+footer{color:var(--muted);font-size:.85rem;text-align:center}
+@media (prefers-reduced-motion: reduce){.tag{transform:none}.live .dot{animation:none}}
+</style>
+</head>
+<body>
+
+
+<script type="application/json" id="dati">
+{
+  "aggiornato": "2026-10-26T12:08",
+  "stato": {"testo": "In attesa, tutto tranquillo", "ora": "2026-10-26T12:08"},
+  "whatsapp": "",
+  "nascita": null,
+  "scommesse": [],
+  "messaggi": [],
+  "giorno": []
+}
+</script>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow" id="hero-eyebrow">Conto alla rovescia</p>
+    <h1 id="hero-title">Mattia sta arrivando</h1>
+    <p class="names">Il nuovo Palmarino sta arrivando.<span id="hero-sub"> Arriva da un giorno all'altro: scommetti su quando nasce e quanto pesa, e lasciagli un messaggio.</span></p>
+
+    <div class="live" id="live" hidden aria-live="polite">
+      <div class="top"><span class="dot" aria-hidden="true"></span><span>Stato in diretta</span><span id="live-when"></span></div>
+      <div class="txt" id="live-txt"></div>
+    </div>
+
+    <div class="tag" id="tag" aria-label="Cartellino della culla">
+      <div class="tag-title">Mattia</div>
+      <div class="tag-grid">
+        <div class="field"><span class="k">Nato il</span><span class="v blank" id="t-data">__ / __ / 2026</span></div>
+        <div class="field"><span class="k">Alle ore</span><span class="v blank" id="t-ora">__ : __</span></div>
+        <div class="field"><span class="k">Peso</span><span class="v blank" id="t-peso">_.___ g</span></div>
+        <div class="field"><span class="k">Lunghezza</span><span class="v blank" id="t-lung">__ cm</span></div>
+      </div>
+      <div class="tag-photo" id="t-foto" hidden><img alt="Mattia appena nato" id="t-foto-img"></div>
+    </div>
+  </header>
+
+  <!-- PRIMA DELLA NASCITA: il toto -->
+  <section id="toto">
+    <p class="eyebrow">Toto-Mattia</p>
+    <h2>Quando nasce, quanto pesa?</h2>
+    <p class="lead">Compila la tua previsione e mandala su WhatsApp. Quando Mattia nasce, la classifica si aggiorna qui e si scopre chi ci è andato più vicino.</p>
+
+    <form class="panel" id="bet-form" novalidate>
+      <label for="bet-name">Il tuo nome<input id="bet-name" autocomplete="name" maxlength="40"></label>
+      <div class="row">
+        <label for="bet-date">Giorno di nascita<input id="bet-date" type="date" min="2026-10-26" max="2026-11-30"></label>
+        <label for="bet-time">Ora<input id="bet-time" type="time" step="60"></label>
+      </div>
+      <div class="row">
+        <label for="bet-weight">Peso <small>in grammi</small><input id="bet-weight" type="number" inputmode="numeric" min="1500" max="5500" step="10" placeholder="3250"></label>
+        <label for="bet-length">Lunghezza <small>in cm</small><input id="bet-length" type="number" inputmode="decimal" min="40" max="60" step="0.5" placeholder="50"></label>
+      </div>
+      <fieldset>
+        <legend>Domanda bonus: i capelli</legend>
+        <div class="chips">
+          <label class="chip" for="hair-1"><input type="radio" name="bet-hair" id="hair-1" value="Tanti capelli"><span>Tanti capelli</span></label>
+          <label class="chip" for="hair-2"><input type="radio" name="bet-hair" id="hair-2" value="Pochi capelli"><span>Pochi capelli</span></label>
+          <label class="chip" for="hair-3"><input type="radio" name="bet-hair" id="hair-3" value="Pelatino"><span>Pelatino</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Domanda bonus: a chi somiglia?</legend>
+        <div class="chips">
+          <label class="chip" for="like-1"><input type="radio" name="bet-like" id="like-1" value="A papà"><span>A papà</span></label>
+          <label class="chip" for="like-2"><input type="radio" name="bet-like" id="like-2" value="A mamma"><span>A mamma</span></label>
+          <label class="chip" for="like-3"><input type="radio" name="bet-like" id="like-3" value="Metà e metà"><span>Metà e metà</span></label>
+        </div>
+      </fieldset>
+      <p class="err" id="bet-err" role="alert"></p>
+      <div class="btns"><button class="btn" type="submit">Prepara la scommessa</button></div>
+      <div class="ready" id="bet-ready" hidden>
+        <pre id="bet-text"></pre>
+        <div class="btns">
+          <a class="btn wa" id="bet-wa" href="#" target="_blank" rel="noopener">Invia su WhatsApp</a>
+          <button class="btn ghost" type="button" id="bet-copy">Copia il testo</button>
+        </div>
+        <p class="hint" id="bet-hint">Se WhatsApp non si apre, copia il testo e mandalo a Marco o Angela. La tua scommessa comparirà qui appena la registrano.</p>
+      </div>
+    </form>
+
+    <div class="rules" aria-label="Come si calcolano i punti">
+      <div class="rule"><div class="pts">50 <span>punti</span></div><p>Giorno e ora: perdi 1 punto per ogni ora di scarto.</p></div>
+      <div class="rule"><div class="pts">25 <span>punti</span></div><p>Peso: perdi 1 punto ogni 50 grammi di scarto.</p></div>
+      <div class="rule"><div class="pts">25 <span>punti</span></div><p>Lunghezza: perdi 2,5 punti per ogni centimetro.</p></div>
+      <div class="rule"><div class="pts">+10 <span>bonus</span></div><p>5 punti per ogni domanda bonus indovinata. Decidono mamma e papà.</p></div>
+    </div>
+  </section>
+
+  <!-- Scommesse ricevute / classifica -->
+  <section id="classifica">
+    <p class="eyebrow" id="cl-eyebrow">Scommesse arrivate</p>
+    <h2 id="cl-title">Chi ha già puntato</h2>
+    <div id="cl-body"></div>
+  </section>
+
+  <!-- DOPO LA NASCITA: il giorno in cui sei nato -->
+  <section id="giorno" hidden>
+    <div class="day">
+      <p class="eyebrow" id="day-eyebrow">Il giorno in cui sei nato</p>
+      <h2 id="day-title">Com'era il mondo quel giorno</h2>
+      <div class="facts" id="day-facts"></div>
+    </div>
+  </section>
+
+  <!-- Guestbook -->
+  <section id="messaggi">
+    <p class="eyebrow">Guestbook</p>
+    <h2>Un messaggio per Mattia</h2>
+    <p class="lead">Scrivi due righe che Mattia leggerà da grande. Se vuoi aggiungere una foto, allegala nella chat di WhatsApp insieme al messaggio.</p>
+    <form class="panel" id="msg-form" novalidate>
+      <label for="msg-name">Il tuo nome<input id="msg-name" autocomplete="name" maxlength="40"></label>
+      <label for="msg-text">Il messaggio<textarea id="msg-text" maxlength="1200" placeholder="Caro Mattia…"></textarea></label>
+      <label for="msg-song">Una canzone per la sua playlist <small>facoltativa: titolo e artista</small><input id="msg-song" maxlength="120"></label>
+      <p class="err" id="msg-err" role="alert"></p>
+      <div class="btns"><button class="btn" type="submit">Prepara il messaggio</button></div>
+      <div class="ready" id="msg-ready" hidden>
+        <pre id="msg-preview"></pre>
+        <div class="btns">
+          <a class="btn wa" id="msg-wa" href="#" target="_blank" rel="noopener">Invia su WhatsApp</a>
+          <button class="btn ghost" type="button" id="msg-copy">Copia il testo</button>
+        </div>
+        <p class="hint">Allega la foto nella chat prima di inviare. Il messaggio comparirà qui sotto appena viene registrato.</p>
+      </div>
+    </form>
+    <div id="notes"></div>
+  </section>
+
+  <!-- Playlist -->
+  <section id="playlist">
+    <p class="eyebrow">Playlist</p>
+    <h2>Le canzoni per Mattia</h2>
+    <p class="lead">Ognuno sceglie una canzone da fargli ascoltare. Aggiungi la tua insieme al messaggio qui sopra.</p>
+    <div id="songs"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(function(){
+  var D;
+  try { D = JSON.parse(document.getElementById('dati').textContent); } catch(e){ D = {scommesse:[],messaggi:[],giorno:[],nascita:null}; }
+  var $ = function(id){ return document.getElementById(id); };
+  var fmtG = function(n){ return Number(n).toLocaleString('it-IT') + ' g'; };
+  var fmtCm = function(n){ return String(n).replace('.', ',') + ' cm'; };
+  function parseLocal(d, t){ var a=d.split('-').map(Number), b=(t||'00:00').split(':').map(Number); return new Date(a[0],a[1]-1,a[2],b[0],b[1]); }
+  function fmtDay(d){ return parseLocal(d).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'long'}); }
+  function fmtDayLong(d){ return parseLocal(d).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+  function el(tag, cls, txt){ var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+
+  function score(b, n){
+    var hrs = Math.abs(parseLocal(b.data,b.ora) - parseLocal(n.data,n.ora)) / 36e5;
+    var pM = Math.max(0, 50 - hrs);
+    var pP = Math.max(0, 25 - Math.abs(b.peso - n.peso) / 50);
+    var pL = Math.max(0, 25 - Math.abs(b.lunghezza - n.lunghezza) * 2.5);
+    var pB = (n.capelli && b.capelli === n.capelli ? 5 : 0) + (n.somiglia && b.somiglia === n.somiglia ? 5 : 0);
+    return { tot: Math.round((pM+pP+pL+pB)*10)/10, ore: hrs };
+  }
+  window.__score = score;
+
+  function waLink(text){
+    var num = String(D.whatsapp||'').replace(/\D/g,'');
+    return 'https://wa.me/' + num + '?text=' + encodeURIComponent(text);
+  }
+  function copy(text, btn){
+    var done = function(){ var o=btn.textContent; btn.textContent='Copiato'; setTimeout(function(){btn.textContent=o;},1800); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    function fallback(){ var pre = btn.closest('.ready').querySelector('pre'); var r=document.createRange(); r.selectNodeContents(pre); var s=getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent='Testo selezionato'; }
+  }
+
+  var born = !!(D.nascita && D.nascita.data);
+
+  // Stato in diretta
+  if (D.stato && D.stato.testo){
+    $('live-txt').textContent = D.stato.testo;
+    try { var w = new Date(D.stato.ora); $('live-when').textContent = '· ' + w.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + ', ' + w.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}); } catch(e){}
+    $('live').hidden = false;
+  }
+
+  // Cartellino + hero
+  if (born){
+    var n = D.nascita;
+    $('hero-eyebrow').textContent = 'È nato · ' + fmtDayLong(n.data);
+    $('hero-title').textContent = 'Benvenuto, Mattia';
+    $('hero-sub').textContent = ' Lasciagli un messaggio qui sotto: lo leggerà da grande.';
+    var p = n.data.split('-');
+    $('t-data').textContent = p[2] + ' / ' + p[1] + ' / ' + p[0];
+    $('t-ora').textContent = n.ora.replace(':',' : ');
+    $('t-peso').textContent = fmtG(n.peso);
+    $('t-lung').textContent = fmtCm(n.lunghezza);
+    ['t-data','t-ora','t-peso','t-lung'].forEach(function(i){ $(i).classList.remove('blank'); });
+    if (n.foto){ $('t-foto-img').src = n.foto; $('t-foto').hidden = false; }
+    $('toto').hidden = true;
+  }
+
+  // Scommesse / classifica
+  var body = $('cl-body'), list = (D.scommesse||[]).slice();
+  if (!list.length){
+    body.appendChild(el('div','empty', born ? 'Nessuna scommessa registrata.' : 'Ancora nessuna scommessa. Sii il primo: compila il modulo qui sopra.'));
+  } else {
+    var wrap = el('div','tbl-wrap'), t = el('table'), thead = el('thead'), hr = el('tr');
+    var cols = born ? ['','Nome','Giorno e ora','Peso','Lungh.','Bonus','Punti'] : ['Nome','Giorno e ora','Peso','Lungh.','Bonus'];
+    cols.forEach(function(c){ hr.appendChild(el('th',null,c)); }); thead.appendChild(hr); t.appendChild(thead);
+    if (born){
+      list.forEach(function(b){ b._s = score(b, D.nascita); });
+      list.sort(function(a,b){ return b._s.tot - a._s.tot; });
+      $('cl-eyebrow').textContent = 'Toto-Mattia · risultati';
+      $('cl-title').textContent = 'Chi ci è andato più vicino';
+    } else {
+      list.sort(function(a,b){ return parseLocal(a.data,a.ora) - parseLocal(b.data,b.ora); });
+      $('cl-title').textContent = list.length === 1 ? 'Una scommessa finora' : list.length + ' scommesse finora';
+    }
+    var tb = el('tbody');
+    list.forEach(function(b,i){
+      var tr = el('tr', born && i===0 ? 'first' : null);
+      if (born) tr.appendChild(el('td','medal', String(i+1)));
+      tr.appendChild(el('td',null,b.nome));
+      tr.appendChild(el('td','num', fmtDay(b.data) + ' · ' + b.ora));
+      tr.appendChild(el('td','num', fmtG(b.peso)));
+      tr.appendChild(el('td','num', fmtCm(b.lunghezza)));
+      tr.appendChild(el('td',null, (b.capelli||'–') + ' · ' + (b.somiglia||'–')));
+      if (born) tr.appendChild(el('td','num', b._s.tot.toLocaleString('it-IT')));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+  }
+
+  // Il giorno in cui sei nato
+  if (born && D.giorno && D.giorno.length){
+    $('giorno').hidden = false;
+    $('day-title').textContent = 'Com’era il mondo ' + fmtDayLong(D.nascita.data);
+    D.giorno.forEach(function(f){
+      var d = el('div','fact'); d.appendChild(el('span','k',f.etichetta)); d.appendChild(el('span','v',f.valore));
+      if (f.nota) d.appendChild(el('span','n',f.nota)); $('day-facts').appendChild(d);
+    });
+  }
+
+  // Guestbook
+  var notes = $('notes'), msgs = D.messaggi || [];
+  if (!msgs.length){
+    notes.appendChild(el('div','empty','Qui compariranno i messaggi per Mattia.'));
+  } else {
+    var g = el('div','notes');
+    msgs.forEach(function(m){
+      var c = el('article','note');
+      if (m.foto){ var im = el('img'); im.src = m.foto; im.alt = 'Foto di ' + m.nome; im.loading='lazy'; c.appendChild(im); }
+      var b = el('div','body'); b.appendChild(el('span','who',m.nome));
+      if (m.data) b.appendChild(el('span','when', fmtDay(m.data)));
+      if (m.testo) b.appendChild(el('p','txt',m.testo));
+      c.appendChild(b); g.appendChild(c);
+    });
+    notes.appendChild(g);
+  }
+
+  // Playlist
+  var songs = (D.messaggi||[]).filter(function(m){ return m.canzone; });
+  if (!songs.length){
+    $('songs').appendChild(el('div','empty','Qui comparirà la playlist di Mattia.'));
+  } else {
+    var ol = el('ol','songs');
+    songs.forEach(function(m,i){
+      var li = el('li'); li.appendChild(el('span','num',String(i+1)));
+      var meta = el('div','meta'); meta.appendChild(el('span','t',m.canzone)); meta.appendChild(el('span','by','scelta da ' + m.nome)); li.appendChild(meta);
+      var a = el('a',null,'Ascolta'); a.href = m.spotify || ('https://open.spotify.com/search/' + encodeURIComponent(m.canzone)); a.target='_blank'; a.rel='noopener'; li.appendChild(a);
+      ol.appendChild(li);
+    });
+    $('songs').appendChild(ol);
+  }
+
+  // Footer
+  try { var u = new Date(D.aggiornato); $('foot').textContent = 'Aggiornato ' + u.toLocaleDateString('it-IT',{day:'numeric',month:'long'}) + ' alle ' + u.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) + ' · con tanto affetto da Marco e Angela'; } catch(e){}
+
+  // Form scommessa
+  $('bet-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var nome=$('bet-name').value.trim(), d=$('bet-date').value, o=$('bet-time').value, p=Number($('bet-weight').value), l=Number(String($('bet-length').value).replace(',','.'));
+    var err='';
+    if(!nome) err='Scrivi il tuo nome.';
+    else if(!d) err='Scegli il giorno.';
+    else if(d<'2026-10-26'||d>'2026-11-30') err='Il giorno deve essere tra il 26 ottobre e il 30 novembre 2026.';
+    else if(!o) err='Scegli l’ora.';
+    else if(!(p>=1500&&p<=5500)) err='Il peso va in grammi, tra 1.500 e 5.500 (es. 3250).';
+    else if(!(l>=40&&l<=60)) err='La lunghezza va in centimetri, tra 40 e 60 (es. 50).';
+    $('bet-err').textContent=err; if(err) return;
+    var txt = 'TOTO-MATTIA\nNome: '+nome+'\nGiorno: '+fmtDay(d)+' ('+d+')\nOra: '+o+'\nPeso: '+fmtG(p)+'\nLunghezza: '+fmtCm(l);
+    var hc = document.querySelector('input[name="bet-hair"]:checked'), lc = document.querySelector('input[name="bet-like"]:checked');
+    if (hc) txt += '\nCapelli: ' + hc.value;
+    if (lc) txt += '\nSomiglia: ' + lc.value;
+    $('bet-text').textContent = txt; $('bet-wa').href = waLink(txt); $('bet-ready').hidden = false;
+  });
+  $('bet-copy').addEventListener('click', function(){ copy($('bet-text').textContent, this); });
+
+  // Form messaggio
+  $('msg-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var nome=$('msg-name').value.trim(), t=$('msg-text').value.trim(), s=$('msg-song').value.trim(), err='';
+    if(!nome) err='Scrivi il tuo nome.'; else if(!t && !s) err='Scrivi un messaggio o una canzone per Mattia.';
+    $('msg-err').textContent=err; if(err) return;
+    var txt = 'MESSAGGIO PER MATTIA\nDa: '+nome+(t ? '\n\n'+t : '')+(s ? '\n\nCanzone: '+s : '');
+    $('msg-preview').textContent = txt; $('msg-wa').href = waLink(txt); $('msg-ready').hidden = false;
+  });
+  $('msg-copy').addEventListener('click', function(){ copy($('msg-preview').textContent, this); });
+})();
+</script>
+
+</body>
+</html>
