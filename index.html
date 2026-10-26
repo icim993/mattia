@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Arriva Mattia</title>
 <meta name="description" content="Toto-Mattia, guestbook e playlist per l'arrivo di Mattia.">
 <meta property="og:title" content="Mattia sta arrivando">
 <meta property="og:description" content="Scommetti su quando nasce e lasciagli un messaggio.">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Arriva Mattia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
@@ -16,20 +15,21 @@
 :root{
   --paper:#F5F8FC; --card:#FFFFFF; --ink:#1A2947; --muted:#5A6A86;
   --sky:#8DB6E2; --sky-soft:#E2EDF9; --sun:#E9A62A; --line:#D2DCEA;
-  --good:#2F7D5B;
+  --good:#2F7D5B; --bad:#C0392B;
   --f-display:"Caprasimo", "Cooper Black", Georgia, serif;
   --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono:"DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media (prefers-color-scheme: dark){:root{
   --paper:#0E1525; --card:#152036; --ink:#E7EEF9; --muted:#9BABC6;
-  --sky:#7AA6D8; --sky-soft:#1B2945; --sun:#F2BC52; --line:#2A3A58; --good:#6CC79C; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --paper:#0E1525; --card:#152036; --ink:#E7EEF9; --muted:#9BABC6;
-  --sky:#7AA6D8; --sky-soft:#1B2945; --sun:#F2BC52; --line:#2A3A58; --good:#6CC79C; color-scheme:dark}
+  --sky:#7AA6D8; --sky-soft:#1B2945; --sun:#F2BC52; --line:#2A3A58; --good:#6CC79C; --bad:#FF8A7A; color-scheme:dark}}
 
 *{box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+[hidden]{display:none!important}
+img{max-width:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
 .wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
 h1,h2{font-family:var(--f-display);font-weight:400;line-height:1.08;text-wrap:balance;margin:0}
@@ -43,13 +43,18 @@ section{display:flex;flex-direction:column;gap:16px}
 /* Hero */
 .hero{display:flex;flex-direction:column;gap:22px}
 .hero .names{font-size:1.05rem;color:var(--muted)}
-.hero .names strong{color:var(--ink);font-weight:600}
+
+/* Stato in diretta */
+.live{display:flex;flex-direction:column;gap:4px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;max-width:520px}
+.live .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.live .dot{width:9px;height:9px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 55%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
+.live .txt{font-weight:700;font-size:1.08rem}
 
 /* Cartellino della culla */
 .tag{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:18px;
   padding:26px 22px 22px 58px;transform:rotate(-1.2deg);box-shadow:0 10px 30px -18px rgba(26,41,71,.45);max-width:520px}
-.tag::before{content:"";position:absolute;left:20px;top:24px;width:18px;height:18px;border-radius:50%;
-  background:var(--paper);border:1.5px solid var(--line)}
+.tag::before{content:"";position:absolute;left:20px;top:24px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:1.5px solid var(--line)}
 .tag::after{content:"";position:absolute;left:28px;top:-26px;width:2px;height:52px;background:var(--sky);border-radius:2px;transform:rotate(14deg)}
 .tag-title{font-family:var(--f-display);font-size:1.7rem;line-height:1;margin-bottom:14px}
 .tag-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
@@ -67,20 +72,29 @@ section{display:flex;flex-direction:column;gap:16px}
 label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.92rem;min-width:0}
 label small{font-weight:400;color:var(--muted)}
 input,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-width:0}
-input{font-family:var(--f-mono)}
-#bet-name,#msg-name,#msg-song{font-family:var(--f-body)}
-textarea{min-height:120px;resize:vertical;font-family:var(--f-body)}
+input[type=date],input[type=time],input[type=number]{font-family:var(--f-mono)}
+input[type=file]{padding:9px;font-size:.9rem}
+textarea{min-height:120px;resize:vertical}
 input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
-.err{color:#C0392B;font-size:.88rem;min-height:1.2em}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#FF8A7A}}
-:root[data-theme="dark"] .err{color:#FF8A7A}
+.err{color:var(--bad);font-size:.88rem;min-height:1.2em}
+.ok{color:var(--good);font-weight:700}
 .btn{font:inherit;font-weight:700;border:0;border-radius:999px;padding:13px 22px;cursor:pointer;background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
-.btn.wa{background:#1E8E57;color:#fff}
-.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
-.btns{display:flex;flex-wrap:wrap;gap:10px}
-.ready{display:flex;flex-direction:column;gap:12px;border-top:1.5px dashed var(--line);padding-top:16px}
-.ready pre{margin:0;white-space:pre-wrap;word-break:break-word;font-family:var(--f-mono);font-size:.88rem;background:var(--sky-soft);border-radius:10px;padding:12px}
+.btn[disabled]{opacity:.55;cursor:progress}
+.btns{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
 .hint{font-size:.88rem;color:var(--muted)}
+.preview{display:flex;align-items:center;gap:10px}
+.preview img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1.5px solid var(--line)}
+.linkbtn{font:inherit;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+
+/* Domande bonus */
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+legend{font-weight:600;font-size:.92rem;padding:0;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;position:relative;font-weight:500}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:inline-block;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.92rem}
+.chip input:checked + span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip input:focus-visible + span{outline:3px solid var(--sky);outline-offset:2px}
 
 /* Regole */
 .rules{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -99,6 +113,7 @@ tr:last-child td{border-bottom:0}
 th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
 td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 tr.first td{background:var(--sky-soft)}
+tr.fresh td{background:color-mix(in srgb,var(--sun) 18%,transparent)}
 .medal{font-family:var(--f-display);color:var(--sun)}
 .empty{border:1.5px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);text-align:center}
 
@@ -110,7 +125,18 @@ tr.first td{background:var(--sky-soft)}
 .note .body{padding:14px;display:flex;flex-direction:column;gap:8px}
 .note .who{font-weight:700}
 .note .when{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
-.note .txt{white-space:pre-wrap}
+.note .txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.note .song{font-size:.88rem;color:var(--muted)}
+
+/* Playlist */
+.songs{list-style:none;margin:0;padding:0;border:1.5px solid var(--line);border-radius:14px;background:var(--card)}
+.songs li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.songs li:last-child{border-bottom:0}
+.songs .num{font-family:var(--f-mono);color:var(--muted);min-width:2ch;font-variant-numeric:tabular-nums}
+.songs .meta{flex:1;min-width:0;display:flex;flex-direction:column}
+.songs .t{font-weight:600;overflow-wrap:anywhere}
+.songs .by{font-size:.85rem;color:var(--muted)}
+.songs a{font-weight:700;color:var(--ink);font-size:.88rem;white-space:nowrap}
 
 /* Il giorno in cui sei nato */
 .day{background:var(--ink);color:var(--paper);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
@@ -123,52 +149,15 @@ tr.first td{background:var(--sky-soft)}
 .fact .v{font-weight:600}
 .fact .n{font-size:.88rem;opacity:.8}
 
-/* Stato in diretta */
-.live{display:flex;flex-direction:column;gap:4px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;max-width:520px}
-.live .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.live .dot{width:9px;height:9px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 55%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
-.live .txt{font-weight:700;font-size:1.08rem}
-
-/* Domande bonus */
-fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
-legend{font-weight:600;font-size:.92rem;padding:0;margin-bottom:8px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:inline-flex;position:relative;font-weight:500}
-.chip input{position:absolute;opacity:0;width:1px;height:1px}
-.chip span{display:inline-block;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.92rem}
-.chip input:checked + span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.chip input:focus-visible + span{outline:3px solid var(--sky);outline-offset:2px}
-
-/* Playlist */
-.songs{list-style:none;margin:0;padding:0;border:1.5px solid var(--line);border-radius:14px;background:var(--card)}
-.songs li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
-.songs li:last-child{border-bottom:0}
-.songs .num{font-family:var(--f-mono);color:var(--muted);min-width:2ch;font-variant-numeric:tabular-nums}
-.songs .meta{flex:1;min-width:0;display:flex;flex-direction:column}
-.songs .t{font-weight:600;overflow-wrap:anywhere}
-.songs .by{font-size:.85rem;color:var(--muted)}
-.songs a{font-weight:700;color:var(--ink);font-size:.88rem;white-space:nowrap}
-
+.banner{border:1.5px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px 14px;font-size:.92rem}
 footer{color:var(--muted);font-size:.85rem;text-align:center}
 @media (prefers-reduced-motion: reduce){.tag{transform:none}.live .dot{animation:none}}
 </style>
+
+<!-- Dati che aggiorna Claude (i fatti del giorno di nascita). Tutto il resto arriva dal database. -->
+<script type="application/json" id="giorno">[]</script>
 </head>
 <body>
-
-
-<script type="application/json" id="dati">
-{
-  "aggiornato": "2026-10-26T12:08",
-  "stato": {"testo": "In attesa, tutto tranquillo", "ora": "2026-10-26T12:08"},
-  "whatsapp": "",
-  "nascita": null,
-  "scommesse": [],
-  "messaggi": [],
-  "giorno": []
-}
-</script>
-
 <div class="wrap">
   <header class="hero">
     <p class="eyebrow" id="hero-eyebrow">Conto alla rovescia</p>
@@ -190,13 +179,14 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
       </div>
       <div class="tag-photo" id="t-foto" hidden><img alt="Mattia appena nato" id="t-foto-img"></div>
     </div>
+    <p class="banner" id="load-err" hidden>Non riesco a caricare scommesse e messaggi in questo momento. Ricarica la pagina tra poco.</p>
   </header>
 
   <!-- PRIMA DELLA NASCITA: il toto -->
   <section id="toto">
     <p class="eyebrow">Toto-Mattia</p>
     <h2>Quando nasce, quanto pesa?</h2>
-    <p class="lead">Compila la tua previsione e mandala su WhatsApp. Quando Mattia nasce, la classifica si aggiorna qui e si scopre chi ci è andato più vicino.</p>
+    <p class="lead">Registra la tua previsione: compare subito qui sotto. Quando Mattia nasce, la classifica si calcola da sola e si scopre chi ci è andato più vicino.</p>
 
     <form class="panel" id="bet-form" novalidate>
       <label for="bet-name">Il tuo nome<input id="bet-name" autocomplete="name" maxlength="40"></label>
@@ -225,15 +215,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
         </div>
       </fieldset>
       <p class="err" id="bet-err" role="alert"></p>
-      <div class="btns"><button class="btn" type="submit">Prepara la scommessa</button></div>
-      <div class="ready" id="bet-ready" hidden>
-        <pre id="bet-text"></pre>
-        <div class="btns">
-          <a class="btn wa" id="bet-wa" href="#" target="_blank" rel="noopener">Invia su WhatsApp</a>
-          <button class="btn ghost" type="button" id="bet-copy">Copia il testo</button>
-        </div>
-        <p class="hint" id="bet-hint">Se WhatsApp non si apre, copia il testo e mandalo a Marco o Angela. La tua scommessa comparirà qui appena la registrano.</p>
-      </div>
+      <div class="btns"><button class="btn" type="submit" id="bet-btn">Registra la scommessa</button><span class="ok" id="bet-ok" role="status"></span></div>
     </form>
 
     <div class="rules" aria-label="Come si calcolano i punti">
@@ -248,13 +230,13 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
   <section id="classifica">
     <p class="eyebrow" id="cl-eyebrow">Scommesse arrivate</p>
     <h2 id="cl-title">Chi ha già puntato</h2>
-    <div id="cl-body"></div>
+    <div id="cl-body"><div class="empty">Caricamento delle scommesse…</div></div>
   </section>
 
   <!-- DOPO LA NASCITA: il giorno in cui sei nato -->
-  <section id="giorno" hidden>
+  <section id="giorno-sec" hidden>
     <div class="day">
-      <p class="eyebrow" id="day-eyebrow">Il giorno in cui sei nato</p>
+      <p class="eyebrow">Il giorno in cui sei nato</p>
       <h2 id="day-title">Com'era il mondo quel giorno</h2>
       <div class="facts" id="day-facts"></div>
     </div>
@@ -264,23 +246,17 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
   <section id="messaggi">
     <p class="eyebrow">Guestbook</p>
     <h2>Un messaggio per Mattia</h2>
-    <p class="lead">Scrivi due righe che Mattia leggerà da grande. Se vuoi aggiungere una foto, allegala nella chat di WhatsApp insieme al messaggio.</p>
+    <p class="lead">Scrivi due righe che Mattia leggerà da grande. Puoi aggiungere una foto dal telefono e una canzone per la sua playlist.</p>
     <form class="panel" id="msg-form" novalidate>
       <label for="msg-name">Il tuo nome<input id="msg-name" autocomplete="name" maxlength="40"></label>
       <label for="msg-text">Il messaggio<textarea id="msg-text" maxlength="1200" placeholder="Caro Mattia…"></textarea></label>
       <label for="msg-song">Una canzone per la sua playlist <small>facoltativa: titolo e artista</small><input id="msg-song" maxlength="120"></label>
+      <label for="msg-photo">Una foto <small>facoltativa</small><input id="msg-photo" type="file" accept="image/*"></label>
+      <div class="preview" id="msg-prev" hidden><img id="msg-prev-img" alt="Anteprima della foto"><button class="linkbtn" type="button" id="msg-prev-del">Togli la foto</button></div>
       <p class="err" id="msg-err" role="alert"></p>
-      <div class="btns"><button class="btn" type="submit">Prepara il messaggio</button></div>
-      <div class="ready" id="msg-ready" hidden>
-        <pre id="msg-preview"></pre>
-        <div class="btns">
-          <a class="btn wa" id="msg-wa" href="#" target="_blank" rel="noopener">Invia su WhatsApp</a>
-          <button class="btn ghost" type="button" id="msg-copy">Copia il testo</button>
-        </div>
-        <p class="hint">Allega la foto nella chat prima di inviare. Il messaggio comparirà qui sotto appena viene registrato.</p>
-      </div>
+      <div class="btns"><button class="btn" type="submit" id="msg-btn">Lascia il messaggio</button><span class="ok" id="msg-ok" role="status"></span></div>
     </form>
-    <div id="notes"></div>
+    <div id="notes"><div class="empty">Caricamento dei messaggi…</div></div>
   </section>
 
   <!-- Playlist -->
@@ -291,175 +267,247 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
     <div id="songs"></div>
   </section>
 
-  <footer id="foot"></footer>
+  <footer>Con tanto affetto da Marco e Angela</footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){
-  var D;
-  try { D = JSON.parse(document.getElementById('dati').textContent); } catch(e){ D = {scommesse:[],messaggi:[],giorno:[],nascita:null}; }
+  // ==== CONFIGURAZIONE SUPABASE ====
+  var SUPABASE_URL = 'https://bwdvwkspoxqquzolxact.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3ZHZ3a3Nwb3hxcXV6b2x4YWN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwMDg5NzksImV4cCI6MjEwODU4NDk3OX0.7-XFLlyZZ9n5v3b-Bxj_vP3uWkTKTWOk67qnPcMTM2I';
+  // =================================
+
   var $ = function(id){ return document.getElementById(id); };
+  var sb = null;
+  try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } }); } catch(e){}
+
+  var S = { info: null, bets: [], msgs: [], fresh: null };
+  var GIORNO = [];
+  try { GIORNO = JSON.parse($('giorno').textContent) || []; } catch(e){}
+
   var fmtG = function(n){ return Number(n).toLocaleString('it-IT') + ' g'; };
-  var fmtCm = function(n){ return String(n).replace('.', ',') + ' cm'; };
+  var fmtCm = function(n){ return String(Number(n)).replace('.', ',') + ' cm'; };
   function parseLocal(d, t){ var a=d.split('-').map(Number), b=(t||'00:00').split(':').map(Number); return new Date(a[0],a[1]-1,a[2],b[0],b[1]); }
   function fmtDay(d){ return parseLocal(d).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'long'}); }
   function fmtDayLong(d){ return parseLocal(d).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+  function hm(t){ return String(t||'').slice(0,5); }
   function el(tag, cls, txt){ var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+  function clear(n){ while(n.firstChild) n.removeChild(n.firstChild); }
 
+  function birth(){
+    var i = S.info;
+    if (!i || !i.nascita_data || !i.nascita_ora || !i.peso || !i.lunghezza) return null;
+    return { data:i.nascita_data, ora:hm(i.nascita_ora), peso:Number(i.peso), lunghezza:Number(i.lunghezza), capelli:i.capelli, somiglia:i.somiglia, foto:i.foto };
+  }
   function score(b, n){
-    var hrs = Math.abs(parseLocal(b.data,b.ora) - parseLocal(n.data,n.ora)) / 36e5;
+    var hrs = Math.abs(parseLocal(b.data,hm(b.ora)) - parseLocal(n.data,n.ora)) / 36e5;
     var pM = Math.max(0, 50 - hrs);
     var pP = Math.max(0, 25 - Math.abs(b.peso - n.peso) / 50);
     var pL = Math.max(0, 25 - Math.abs(b.lunghezza - n.lunghezza) * 2.5);
     var pB = (n.capelli && b.capelli === n.capelli ? 5 : 0) + (n.somiglia && b.somiglia === n.somiglia ? 5 : 0);
-    return { tot: Math.round((pM+pP+pL+pB)*10)/10, ore: hrs };
-  }
-  window.__score = score;
-
-  function waLink(text){
-    var num = String(D.whatsapp||'').replace(/\D/g,'');
-    return 'https://wa.me/' + num + '?text=' + encodeURIComponent(text);
-  }
-  function copy(text, btn){
-    var done = function(){ var o=btn.textContent; btn.textContent='Copiato'; setTimeout(function(){btn.textContent=o;},1800); };
-    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
-    function fallback(){ var pre = btn.closest('.ready').querySelector('pre'); var r=document.createRange(); r.selectNodeContents(pre); var s=getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent='Testo selezionato'; }
+    return Math.round((pM+pP+pL+pB)*10)/10;
   }
 
-  var born = !!(D.nascita && D.nascita.data);
+  function render(){
+    var n = birth(), born = !!n;
 
-  // Stato in diretta
-  if (D.stato && D.stato.testo){
-    $('live-txt').textContent = D.stato.testo;
-    try { var w = new Date(D.stato.ora); $('live-when').textContent = '· ' + w.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + ', ' + w.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}); } catch(e){}
-    $('live').hidden = false;
-  }
+    // Stato in diretta
+    if (S.info && S.info.stato){
+      $('live-txt').textContent = S.info.stato;
+      try { var w = new Date(S.info.stato_ora); $('live-when').textContent = '· ' + w.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + ', ' + w.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}); } catch(e){}
+      $('live').hidden = false;
+    } else { $('live').hidden = true; }
 
-  // Cartellino + hero
-  if (born){
-    var n = D.nascita;
-    $('hero-eyebrow').textContent = 'È nato · ' + fmtDayLong(n.data);
-    $('hero-title').textContent = 'Benvenuto, Mattia';
-    $('hero-sub').textContent = ' Lasciagli un messaggio qui sotto: lo leggerà da grande.';
-    var p = n.data.split('-');
-    $('t-data').textContent = p[2] + ' / ' + p[1] + ' / ' + p[0];
-    $('t-ora').textContent = n.ora.replace(':',' : ');
-    $('t-peso').textContent = fmtG(n.peso);
-    $('t-lung').textContent = fmtCm(n.lunghezza);
-    ['t-data','t-ora','t-peso','t-lung'].forEach(function(i){ $(i).classList.remove('blank'); });
-    if (n.foto){ $('t-foto-img').src = n.foto; $('t-foto').hidden = false; }
-    $('toto').hidden = true;
-  }
-
-  // Scommesse / classifica
-  var body = $('cl-body'), list = (D.scommesse||[]).slice();
-  if (!list.length){
-    body.appendChild(el('div','empty', born ? 'Nessuna scommessa registrata.' : 'Ancora nessuna scommessa. Sii il primo: compila il modulo qui sopra.'));
-  } else {
-    var wrap = el('div','tbl-wrap'), t = el('table'), thead = el('thead'), hr = el('tr');
-    var cols = born ? ['','Nome','Giorno e ora','Peso','Lungh.','Bonus','Punti'] : ['Nome','Giorno e ora','Peso','Lungh.','Bonus'];
-    cols.forEach(function(c){ hr.appendChild(el('th',null,c)); }); thead.appendChild(hr); t.appendChild(thead);
+    // Hero e cartellino
     if (born){
-      list.forEach(function(b){ b._s = score(b, D.nascita); });
-      list.sort(function(a,b){ return b._s.tot - a._s.tot; });
-      $('cl-eyebrow').textContent = 'Toto-Mattia · risultati';
-      $('cl-title').textContent = 'Chi ci è andato più vicino';
-    } else {
-      list.sort(function(a,b){ return parseLocal(a.data,a.ora) - parseLocal(b.data,b.ora); });
-      $('cl-title').textContent = list.length === 1 ? 'Una scommessa finora' : list.length + ' scommesse finora';
+      $('hero-eyebrow').textContent = 'È nato · ' + fmtDayLong(n.data);
+      $('hero-title').textContent = 'Benvenuto, Mattia';
+      $('hero-sub').textContent = ' Lasciagli un messaggio qui sotto: lo leggerà da grande.';
+      var p = n.data.split('-');
+      $('t-data').textContent = p[2] + ' / ' + p[1] + ' / ' + p[0];
+      $('t-ora').textContent = n.ora.replace(':',' : ');
+      $('t-peso').textContent = fmtG(n.peso);
+      $('t-lung').textContent = fmtCm(n.lunghezza);
+      ['t-data','t-ora','t-peso','t-lung'].forEach(function(i){ $(i).classList.remove('blank'); });
+      if (n.foto){ $('t-foto-img').src = n.foto; $('t-foto').hidden = false; }
+      $('toto').hidden = true;
     }
-    var tb = el('tbody');
-    list.forEach(function(b,i){
-      var tr = el('tr', born && i===0 ? 'first' : null);
-      if (born) tr.appendChild(el('td','medal', String(i+1)));
-      tr.appendChild(el('td',null,b.nome));
-      tr.appendChild(el('td','num', fmtDay(b.data) + ' · ' + b.ora));
-      tr.appendChild(el('td','num', fmtG(b.peso)));
-      tr.appendChild(el('td','num', fmtCm(b.lunghezza)));
-      tr.appendChild(el('td',null, (b.capelli||'–') + ' · ' + (b.somiglia||'–')));
-      if (born) tr.appendChild(el('td','num', b._s.tot.toLocaleString('it-IT')));
-      tb.appendChild(tr);
-    });
-    t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+
+    // Scommesse / classifica
+    var body = $('cl-body'); clear(body);
+    var list = S.bets.slice();
+    if (!list.length){
+      body.appendChild(el('div','empty', born ? 'Nessuna scommessa registrata.' : 'Ancora nessuna scommessa. Sii il primo: compila il modulo qui sopra.'));
+      $('cl-title').textContent = born ? 'Chi ci è andato più vicino' : 'Chi ha già puntato';
+    } else {
+      var wrap = el('div','tbl-wrap'), t = el('table'), thead = el('thead'), hr = el('tr');
+      var cols = born ? ['','Nome','Giorno e ora','Peso','Lungh.','Bonus','Punti'] : ['Nome','Giorno e ora','Peso','Lungh.','Bonus'];
+      cols.forEach(function(c){ hr.appendChild(el('th',null,c)); }); thead.appendChild(hr); t.appendChild(thead);
+      if (born){
+        list.forEach(function(b){ b._s = score(b, n); });
+        list.sort(function(a,b){ return b._s - a._s; });
+        $('cl-eyebrow').textContent = 'Toto-Mattia · risultati';
+        $('cl-title').textContent = 'Chi ci è andato più vicino';
+      } else {
+        list.sort(function(a,b){ return parseLocal(a.data,hm(a.ora)) - parseLocal(b.data,hm(b.ora)); });
+        $('cl-title').textContent = list.length === 1 ? 'Una scommessa finora' : list.length + ' scommesse finora';
+      }
+      var tb = el('tbody');
+      list.forEach(function(b,i){
+        var cls = born && i===0 ? 'first' : (b.id === S.fresh ? 'fresh' : null);
+        var tr = el('tr', cls);
+        if (born) tr.appendChild(el('td','medal', String(i+1)));
+        tr.appendChild(el('td',null,b.nome));
+        tr.appendChild(el('td','num', fmtDay(b.data) + ' · ' + hm(b.ora)));
+        tr.appendChild(el('td','num', fmtG(b.peso)));
+        tr.appendChild(el('td','num', fmtCm(b.lunghezza)));
+        tr.appendChild(el('td',null, (b.capelli||'–') + ' · ' + (b.somiglia||'–')));
+        if (born) tr.appendChild(el('td','num', b._s.toLocaleString('it-IT')));
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    }
+
+    // Il giorno in cui sei nato
+    if (born && GIORNO.length){
+      $('giorno-sec').hidden = false;
+      $('day-title').textContent = 'Com’era il mondo ' + fmtDayLong(n.data);
+      var facts = $('day-facts'); clear(facts);
+      GIORNO.forEach(function(f){
+        var d = el('div','fact'); d.appendChild(el('span','k',f.etichetta)); d.appendChild(el('span','v',f.valore));
+        if (f.nota) d.appendChild(el('span','n',f.nota)); facts.appendChild(d);
+      });
+    }
+
+    // Guestbook
+    var notes = $('notes'); clear(notes);
+    var msgs = S.msgs.filter(function(m){ return m.testo || m.foto; });
+    if (!msgs.length){
+      notes.appendChild(el('div','empty','Qui compariranno i messaggi per Mattia.'));
+    } else {
+      var g = el('div','notes');
+      msgs.slice().reverse().forEach(function(m){
+        var c = el('article','note');
+        if (m.foto){ var im = el('img'); im.src = m.foto; im.alt = 'Foto di ' + m.nome; im.loading='lazy'; c.appendChild(im); }
+        var b = el('div','body'); b.appendChild(el('span','who',m.nome));
+        b.appendChild(el('span','when', new Date(m.created_at).toLocaleDateString('it-IT',{day:'numeric',month:'long'})));
+        if (m.testo) b.appendChild(el('p','txt',m.testo));
+        if (m.canzone) b.appendChild(el('span','song','Canzone: ' + m.canzone));
+        c.appendChild(b); g.appendChild(c);
+      });
+      notes.appendChild(g);
+    }
+
+    // Playlist
+    var songsBox = $('songs'); clear(songsBox);
+    var songs = S.msgs.filter(function(m){ return m.canzone; });
+    if (!songs.length){
+      songsBox.appendChild(el('div','empty','Qui comparirà la playlist di Mattia.'));
+    } else {
+      var ol = el('ol','songs');
+      songs.forEach(function(m,i){
+        var li = el('li'); li.appendChild(el('span','num',String(i+1)));
+        var meta = el('div','meta'); meta.appendChild(el('span','t',m.canzone)); meta.appendChild(el('span','by','scelta da ' + m.nome)); li.appendChild(meta);
+        var a = el('a',null,'Ascolta'); a.href = 'https://open.spotify.com/search/' + encodeURIComponent(m.canzone); a.target='_blank'; a.rel='noopener'; li.appendChild(a);
+        ol.appendChild(li);
+      });
+      songsBox.appendChild(ol);
+    }
   }
 
-  // Il giorno in cui sei nato
-  if (born && D.giorno && D.giorno.length){
-    $('giorno').hidden = false;
-    $('day-title').textContent = 'Com’era il mondo ' + fmtDayLong(D.nascita.data);
-    D.giorno.forEach(function(f){
-      var d = el('div','fact'); d.appendChild(el('span','k',f.etichetta)); d.appendChild(el('span','v',f.valore));
-      if (f.nota) d.appendChild(el('span','n',f.nota)); $('day-facts').appendChild(d);
-    });
+  async function load(){
+    if (!sb){ $('load-err').hidden = false; render(); return; }
+    try {
+      var r = await Promise.all([
+        sb.from('info').select('*').eq('id',1).maybeSingle(),
+        sb.from('bets').select('*').order('created_at',{ascending:true}),
+        sb.from('messages').select('*').order('created_at',{ascending:true})
+      ]);
+      if (r[0].error || r[1].error || r[2].error) throw (r[0].error || r[1].error || r[2].error);
+      S.info = r[0].data; S.bets = r[1].data || []; S.msgs = r[2].data || [];
+      $('load-err').hidden = true;
+    } catch(e){ console.error(e); $('load-err').hidden = false; }
+    render();
   }
 
-  // Guestbook
-  var notes = $('notes'), msgs = D.messaggi || [];
-  if (!msgs.length){
-    notes.appendChild(el('div','empty','Qui compariranno i messaggi per Mattia.'));
-  } else {
-    var g = el('div','notes');
-    msgs.forEach(function(m){
-      var c = el('article','note');
-      if (m.foto){ var im = el('img'); im.src = m.foto; im.alt = 'Foto di ' + m.nome; im.loading='lazy'; c.appendChild(im); }
-      var b = el('div','body'); b.appendChild(el('span','who',m.nome));
-      if (m.data) b.appendChild(el('span','when', fmtDay(m.data)));
-      if (m.testo) b.appendChild(el('p','txt',m.testo));
-      c.appendChild(b); g.appendChild(c);
+  // Foto: ridimensiona sul telefono prima di caricarla
+  function shrink(file){
+    return new Promise(function(res, rej){
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function(){
+        var max = 1600, w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, max / Math.max(w,h));
+        var c = document.createElement('canvas'); c.width = Math.round(w*k); c.height = Math.round(h*k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function(b){ b ? res(b) : rej(new Error('blob')); }, 'image/jpeg', 0.82);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('decode')); };
+      img.src = url;
     });
-    notes.appendChild(g);
   }
+  var photoBlob = null;
+  $('msg-photo').addEventListener('change', async function(){
+    $('msg-err').textContent = ''; photoBlob = null; $('msg-prev').hidden = true;
+    var f = this.files && this.files[0]; if (!f) return;
+    try { photoBlob = await shrink(f); $('msg-prev-img').src = URL.createObjectURL(photoBlob); $('msg-prev').hidden = false; }
+    catch(e){ this.value=''; $('msg-err').textContent = 'Non riesco ad aprire questa foto. Prova con un’altra immagine (JPG o PNG).'; }
+  });
+  $('msg-prev-del').addEventListener('click', function(){ photoBlob = null; $('msg-photo').value=''; $('msg-prev').hidden = true; });
 
-  // Playlist
-  var songs = (D.messaggi||[]).filter(function(m){ return m.canzone; });
-  if (!songs.length){
-    $('songs').appendChild(el('div','empty','Qui comparirà la playlist di Mattia.'));
-  } else {
-    var ol = el('ol','songs');
-    songs.forEach(function(m,i){
-      var li = el('li'); li.appendChild(el('span','num',String(i+1)));
-      var meta = el('div','meta'); meta.appendChild(el('span','t',m.canzone)); meta.appendChild(el('span','by','scelta da ' + m.nome)); li.appendChild(meta);
-      var a = el('a',null,'Ascolta'); a.href = m.spotify || ('https://open.spotify.com/search/' + encodeURIComponent(m.canzone)); a.target='_blank'; a.rel='noopener'; li.appendChild(a);
-      ol.appendChild(li);
-    });
-    $('songs').appendChild(ol);
-  }
-
-  // Footer
-  try { var u = new Date(D.aggiornato); $('foot').textContent = 'Aggiornato ' + u.toLocaleDateString('it-IT',{day:'numeric',month:'long'}) + ' alle ' + u.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) + ' · con tanto affetto da Marco e Angela'; } catch(e){}
-
-  // Form scommessa
-  $('bet-form').addEventListener('submit', function(e){
-    e.preventDefault();
+  // Registra scommessa
+  $('bet-form').addEventListener('submit', async function(e){
+    e.preventDefault(); $('bet-ok').textContent = '';
     var nome=$('bet-name').value.trim(), d=$('bet-date').value, o=$('bet-time').value, p=Number($('bet-weight').value), l=Number(String($('bet-length').value).replace(',','.'));
+    var hc = document.querySelector('input[name="bet-hair"]:checked'), lc = document.querySelector('input[name="bet-like"]:checked');
     var err='';
     if(!nome) err='Scrivi il tuo nome.';
     else if(!d) err='Scegli il giorno.';
     else if(d<'2026-10-26'||d>'2026-11-30') err='Il giorno deve essere tra il 26 ottobre e il 30 novembre 2026.';
     else if(!o) err='Scegli l’ora.';
-    else if(!(p>=1500&&p<=5500)) err='Il peso va in grammi, tra 1.500 e 5.500 (es. 3250).';
-    else if(!(l>=40&&l<=60)) err='La lunghezza va in centimetri, tra 40 e 60 (es. 50).';
+    else if(!(p>=1500&&p<=5500)) err='Il peso va in grammi, tra 1.500 e 5.500 (per esempio 3250).';
+    else if(!(l>=40&&l<=60)) err='La lunghezza va in centimetri, tra 40 e 60 (per esempio 50).';
     $('bet-err').textContent=err; if(err) return;
-    var txt = 'TOTO-MATTIA\nNome: '+nome+'\nGiorno: '+fmtDay(d)+' ('+d+')\nOra: '+o+'\nPeso: '+fmtG(p)+'\nLunghezza: '+fmtCm(l);
-    var hc = document.querySelector('input[name="bet-hair"]:checked'), lc = document.querySelector('input[name="bet-like"]:checked');
-    if (hc) txt += '\nCapelli: ' + hc.value;
-    if (lc) txt += '\nSomiglia: ' + lc.value;
-    $('bet-text').textContent = txt; $('bet-wa').href = waLink(txt); $('bet-ready').hidden = false;
+    if (!sb){ $('bet-err').textContent='Il salvataggio non è disponibile ora. Riprova tra poco.'; return; }
+    var btn = $('bet-btn'); btn.disabled = true; btn.textContent = 'Salvo…';
+    try {
+      var r = await sb.from('bets').insert({ nome:nome, data:d, ora:o, peso:Math.round(p), lunghezza:Math.round(l*2)/2, capelli: hc?hc.value:null, somiglia: lc?lc.value:null }).select().single();
+      if (r.error) throw r.error;
+      S.fresh = r.data.id; this.reset();
+      $('bet-ok').textContent = 'Scommessa registrata!';
+      await load();
+    } catch(ex){ console.error(ex); $('bet-err').textContent = 'Non sono riuscito a salvare la scommessa. Controlla la connessione e riprova.'; }
+    btn.disabled = false; btn.textContent = 'Registra la scommessa';
   });
-  $('bet-copy').addEventListener('click', function(){ copy($('bet-text').textContent, this); });
 
-  // Form messaggio
-  $('msg-form').addEventListener('submit', function(e){
-    e.preventDefault();
+  // Lascia messaggio
+  $('msg-form').addEventListener('submit', async function(e){
+    e.preventDefault(); $('msg-ok').textContent = '';
     var nome=$('msg-name').value.trim(), t=$('msg-text').value.trim(), s=$('msg-song').value.trim(), err='';
     if(!nome) err='Scrivi il tuo nome.'; else if(!t && !s) err='Scrivi un messaggio o una canzone per Mattia.';
     $('msg-err').textContent=err; if(err) return;
-    var txt = 'MESSAGGIO PER MATTIA\nDa: '+nome+(t ? '\n\n'+t : '')+(s ? '\n\nCanzone: '+s : '');
-    $('msg-preview').textContent = txt; $('msg-wa').href = waLink(txt); $('msg-ready').hidden = false;
+    if (!sb){ $('msg-err').textContent='Il salvataggio non è disponibile ora. Riprova tra poco.'; return; }
+    var btn = $('msg-btn'); btn.disabled = true; btn.textContent = photoBlob ? 'Carico la foto…' : 'Salvo…';
+    try {
+      var foto = null;
+      if (photoBlob){
+        var path = Date.now() + '-' + Math.random().toString(36).slice(2,8) + '.jpg';
+        var up = await sb.storage.from('foto').upload(path, photoBlob, { contentType:'image/jpeg' });
+        if (up.error) throw up.error;
+        foto = sb.storage.from('foto').getPublicUrl(path).data.publicUrl;
+      }
+      var r = await sb.from('messages').insert({ nome:nome, testo:t||null, canzone:s||null, foto:foto });
+      if (r.error) throw r.error;
+      this.reset(); photoBlob = null; $('msg-prev').hidden = true;
+      $('msg-ok').textContent = 'Messaggio lasciato, grazie!';
+      await load();
+    } catch(ex){ console.error(ex); $('msg-err').textContent = 'Non sono riuscito a salvare il messaggio. Controlla la connessione e riprova.'; }
+    btn.disabled = false; btn.textContent = 'Lascia il messaggio';
   });
-  $('msg-copy').addEventListener('click', function(){ copy($('msg-preview').textContent, this); });
+
+  load();
+  setInterval(function(){ if (!document.hidden) load(); }, 60000);
 })();
 </script>
-
 </body>
 </html>
