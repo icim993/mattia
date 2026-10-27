@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/style.css">
-  <link rel="stylesheet" href="../assets/book-v2.css">
+  <link rel="stylesheet" href="../assets/book-v2.css?v=3-20261027">
 </head>
 <body>
   <a class="skip" href="#main">Vai al contenuto</a>
@@ -83,6 +83,30 @@
         <div id="admin-memory-list" class="admin-memory-list"></div>
       </section>
       <section id="owner-only" hidden>
+        <section class="panel approved-panel" id="approved-panel" hidden aria-labelledby="approved-title">
+          <div class="panel-head"><span class="panel-symbol" aria-hidden="true">♡</span><div>
+            <p class="overline">TAVOLE PRONTE DA SFOGLIARE</p><h2 id="approved-title">Carica pagina approvata</h2>
+          </div></div>
+          <p class="muted">Carica le composizioni finali già impaginate, senza ritagli né compressione. Ogni PNG viene custodito nello Storage privato e mostrato come un'apertura completa del libro.</p>
+          <form id="approved-form" class="stack">
+            <div class="form-grid">
+              <label>Capitolo <select id="approved-chapter" required></select></label>
+              <label>Immagini PNG approvate (massimo 10)
+                <input id="approved-files" type="file" accept="image/png,.png" multiple required>
+              </label>
+            </div>
+            <p class="tiny-note">Le tavole vengono ordinate da 1 in poi; su PC vedrai la doppia pagina, mentre su smartphone sfoglierai la metà sinistra e poi la destra. I file originali rimangono invariati e privati.</p>
+            <div id="approved-draft" class="approved-draft" aria-live="polite"></div>
+            <div id="approved-existing" class="approved-existing"></div>
+            <p id="approved-status" class="status" role="status" aria-live="polite"></p>
+            <div class="button-row">
+              <button class="primary-btn" type="submit" id="approved-submit">Pubblica nel libro ♡</button>
+              <button class="outline-btn" type="button" id="approved-refresh">Aggiorna elenco</button>
+              <a class="outline-btn" href="../" target="_blank" rel="noopener noreferrer">Controlla il libro ↗</a>
+            </div>
+          </form>
+        </section>
+
         <section id="private-board" class="panel" hidden aria-labelledby="private-board-title">
           <div class="panel-head"><span class="panel-symbol" aria-hidden="true">✉</span><div><p class="overline">SOLO MARCO E ANGELA</p><h2 id="private-board-title">Bacheca privata</h2></div></div>
           <p class="muted">Le dediche e le fotografie inviate dal sito sono visibili soltanto a voi due.</p>
@@ -120,6 +144,7 @@
   <script src="../assets/common.js?v=2-20261027"></script>
   <script src="../assets/photo-style.js?v=2-20261027"></script>
   <script src="../assets/admin.js?v=2-20261027"></script>
-  <script src="../assets/photo-studio.js?v=2-20261027"></script>
+  <script src="../assets/photo-studio.js?v=3-20261027"></script>
+  <script src="../assets/approved-pages.js?v=3-20261027"></script>
 </body>
 </html>

@@ -112,7 +112,7 @@
  function listMedia(){
    const id=$('studio-memory').value;
    const select=$('studio-media'),old=select.value;select.replaceChildren();
-   const items=media.filter(x=>x.memory_id===id).sort((a,b)=>a.sort_order-b.sort_order);
+   const items=media.filter(x=>x.memory_id===id && x.photo_settings?.approved_spread!==true).sort((a,b)=>a.sort_order-b.sort_order);
    items.forEach((x,i)=>select.appendChild(makeOption(x.id,`${x.media_kind==='video'?'Video':'Foto'} ${i+1}${x.caption?' · '+x.caption.slice(0,32):''}`)));
    if(items.some(x=>x.id===old))select.value=old;
    const m=selectedMemory();$('studio-page-order').value=m?.page_order??0;
@@ -130,7 +130,7 @@
      ]);
      if(!active())return;
      const err=r.find(x=>x.error);if(err)throw err.error;
-     memories=r[0].data||[];media=r[1].data||[];
+     media=(r[1].data||[]).filter(x=>x.photo_settings?.approved_spread!==true);memories=(r[0].data||[]).filter(m=>media.some(x=>x.memory_id===m.id));
      const select=$('studio-memory'),old=select.value;select.replaceChildren();
      for(const m of memories)select.appendChild(makeOption(m.id,m.title));
      if(memories.some(x=>x.id===old))select.value=old;
