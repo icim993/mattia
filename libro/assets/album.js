@@ -7,8 +7,9 @@
   const state = { chapters:[], memories:[], media:[], notes:[], selected:null, pageIndex:0, turning:false };
   const mobile = matchMedia('(max-width: 760px)');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let turnVersion=0;
+  function cancelTurn(){++turnVersion;state.turning=false;}
   const PERMITTED_LAYOUTS = new Set(['full','polaroid','paper','film','gallery','letter']);
-  const clamp = (value,min,max,fallback) => Number.isFinite(Number(value)) ? Math.min(max,Math.max(min,Number(value))) : fallback;
 
   function memoryMedia(id) {
     return state.media.filter(x => x.memory_id === id)
@@ -44,12 +45,6 @@
     if(body) head.appendChild(section('p','book-leaf-body',body));
     leaf.appendChild(head);
   }
-  function setPhotoAppearance(img,settings) {
-    const x=clamp(settings.x,0,100,50), y=clamp(settings.y,0,100,50);
-    img.style.objectPosition=`${x}% ${y}%`;
-    img.style.transform=`scale(${clamp(settings.zoom,1,1.8,1)}) rotate(${clamp(settings.rotate,-15,15,0)}deg)`;
-    img.style.filter=`brightness(${clamp(settings.brightness,70,135,100)}%) contrast(${clamp(settings.contrast,70,140,100)}%) saturate(${clamp(settings.saturation,0,160,100)}%) sepia(${clamp(settings.sepia,0,100,0)}%) grayscale(${clamp(settings.grayscale,0,100,0)}%)`;
-  }
   function photoPage(leaf,page) {
     const {memory,media,index} = page;
     const layout = PERMITTED_LAYOUTS.has(media.layout)?media.layout:'paper';
@@ -61,7 +56,7 @@
       img.loading='lazy';
       img.decoding='async';
       const settings=media.photo_settings && typeof media.photo_settings==='object'?media.photo_settings:{};
-      setPhotoAppearance(img,settings);
+      window.MattiaPhoto.apply(img,settings);
       frame.appendChild(img);
       M.secureMediaUrl(media.storage_path).then(url=>{if(img.isConnected)img.src=url;})
         .catch(()=>{if(img.isConnected){img.alt='Fotografia non disponibile';frame.classList.add('book-photo-error');}});
@@ -154,6 +149,7 @@
     const next=state.pageIndex+direction*per;
     if(next<0 || next>=pages.length)return;
     state.turning=true;
+    const version=++turnVersion;
     const spread=$('memories-list').querySelector('.book-spread');
     try{
       if(!reduced.matches && spread){
@@ -163,6 +159,7 @@
           {transform:`perspective(1200px) rotateY(${direction>0?-68:68}deg)`,opacity:0.13}
         ],{duration:230,easing:'cubic-bezier(.5,0,.8,.4)'}).finished.catch(()=>{});
       }
+      if(version!==turnVersion)return;
       state.pageIndex=next;renderCurrent();
       const newSpread=$('memories-list').querySelector('.book-spread');
       if(!reduced.matches && newSpread){
@@ -172,10 +169,11 @@
           {transform:'perspective(1200px) rotateY(0deg)',opacity:1}
         ],{duration:250,easing:'cubic-bezier(.2,.6,.2,1)'}).finished.catch(()=>{});
       }
-    } finally {state.turning=false;}
+    } finally {if(version===turnVersion)state.turning=false;}
   }
   function openChapter(id,scroll){
     const chapter=state.chapters.find(c=>c.id===id);if(!chapter)return;
+    cancelTurn();
     if(state.selected!==id)state.pageIndex=0;
     state.selected=id;
     $('selected-number').textContent=`CAPITOLO ${String(id).padStart(2,'0')}`;
@@ -186,17 +184,20 @@
     if(scroll)$('memory-section').scrollIntoView({behavior:reduced.matches?'auto':'smooth',block:'start'});
   }
   async function loadBook(){
+    const version=M.ctx.accessVersion;
     const results=await Promise.all([
       M.sb.from('album_chapters').select('id,slug,title,subtitle,introduction,visible').order('id'),
       M.sb.from('album_memories').select('id,chapter_id,title,body,memory_date,created_at,created_by,page_order').order('created_at'),
       M.sb.from('album_media').select('id,memory_id,storage_path,media_kind,sort_order,caption,layout,photo_settings').order('sort_order')
     ]);
+    if(version!==M.ctx.accessVersion || !M.ctx.role)return;
     const failure=results.find(r=>r.error);if(failure)throw failure.error;
     state.chapters=results[0].data||[];state.memories=results[1].data||[];state.media=results[2].data||[];
     state.notes=[];
     if(state.chapters.some(c=>c.id===5) && M.ctx.role==='owner'){
       try{
         const privateNotes=await M.sb.from('guestbook_private').select('nome,testo,canzone,created_at').order('created_at',{ascending:false});
+        if(version!==M.ctx.accessVersion || M.ctx.role!=='owner')return;
         if(!privateNotes.error)state.notes=(privateNotes.data||[]).filter(x=>x.testo);
       }catch{state.notes=[];}
     }
@@ -213,23 +214,24 @@
   $('memories-list').addEventListener('touchend',e=>{
     if(!touch||!e.changedTouches.length)return;
     const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;touch=null;
-    if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.5)turn(dx<0?1:-1);
+    if(!e.target.closest('button,video') && Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.5)turn(dx<0?1:-1);
   },{passive:true});
   document.addEventListener('keydown',e=>{
-    if($('memory-section').hidden || ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
-    if(e.key==='ArrowRight')turn(1);
-    if(e.key==='ArrowLeft')turn(-1);
+    if($('memory-section').hidden || !$('lightbox').hidden || ['INPUT','TEXTAREA','SELECT','VIDEO'].includes(document.activeElement?.tagName))return;
+    if(e.key==='ArrowRight'){e.preventDefault();turn(1);}
+    if(e.key==='ArrowLeft'){e.preventDefault();turn(-1);}
   });
-  const mediaResize=()=>{if(state.selected!==null && !$('memory-section').hidden)renderCurrent();};
+  const mediaResize=()=>{cancelTurn();if(state.selected!==null && !$('memory-section').hidden)renderCurrent();};
   if(mobile.addEventListener) mobile.addEventListener('change',mediaResize);
   else mobile.addListener(mediaResize);
   $('back-chapters').addEventListener('click',()=>{
+    cancelTurn();
     $('memory-section').hidden=true;state.selected=null;
     $('chapters').scrollIntoView({behavior:reduced.matches?'auto':'smooth'});
   });
   $('open-book').addEventListener('click',e=>{if($('private-content').hidden){e.preventDefault();$('gate').scrollIntoView({behavior:'smooth'});}});
   M.start({
-    onAccessCleared:()=>{state.chapters=[];state.memories=[];state.media=[];state.notes=[];state.selected=null;M.empty($('memories-list'));$('memory-section').hidden=true;},
+    onAccessCleared:()=>{cancelTurn();state.chapters=[];state.memories=[];state.media=[];state.notes=[];state.selected=null;M.empty($('memories-list'));M.empty($('chapter-grid'));$('memory-section').hidden=true;},
     onAuthorized:async()=>{try{await loadBook();}catch(error){console.error('Caricamento libro',error);M.empty($('chapter-grid'));$('chapter-grid').appendChild(section('p','empty-state','Non è stato possibile caricare il libro. Riprova.'));}}
   });
 })();

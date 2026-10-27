@@ -47,9 +47,11 @@ class IntegrationTests(unittest.TestCase):
     def test_no_private_media_or_embedded_admin_credentials(self):
         media = []
         tokens = 0
-        for file in ROOT.rglob('*'):
-            if not file.is_file() or '.git' in file.relative_to(ROOT).parts:
-                continue
+        candidates = subprocess.check_output(['git','-c',f'safe.directory={ROOT.as_posix()}',
+            'ls-files','--cached','--others','--exclude-standard'],cwd=ROOT).decode().splitlines()
+        for rel in candidates:
+            file=ROOT/rel
+            if not file.is_file():continue
             if file.suffix.lower() in {'.jpg','.jpeg','.png','.webp','.gif','.heic','.mp4','.mov','.zip'}:
                 media.append(file.relative_to(ROOT).as_posix())
             if file.suffix.lower() not in {'.js','.html','.md','.sql','.py','.cjs'}:

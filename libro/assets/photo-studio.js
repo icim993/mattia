@@ -24,6 +24,7 @@
        <div class="studio-photo-frame paper" id="studio-frame"><p class="muted" id="studio-no-photo">Seleziona una foto.</p></div>
      </div>
      <p class="studio-preview-label">ANTEPRIMA PERSONALE · NESSUNA FOTO VIENE PUBBLICATA</p>
+     <p id="studio-preview-caption" class="book-photo-caption"></p>
     </div>
     <div class="studio-controls">
       <label>Stile della pagina
@@ -32,6 +33,7 @@
       <label>Tonalità iniziale
         <select id="studio-preset"><option value="natural">Naturale</option><option value="warm">Calda e luminosa</option><option value="memory">Ricordo vintage</option><option value="bw">Bianco e nero</option></select>
       </label>
+      <label>Adattamento della fotografia<select id="studio-fit"><option value="contain">Intera · conserva tutti i bordi</option><option value="cover">Ritaglio · riempie la cornice</option></select></label>
       <label>Didascalia di questa fotografia
         <input id="studio-caption" maxlength="220" placeholder="Una frase solo per questa foto…">
       </label>
@@ -68,25 +70,26 @@
    memory:{brightness:103,contrast:89,saturation:76,sepia:42,grayscale:0},
    bw:{brightness:104,contrast:114,saturation:0,sepia:0,grayscale:100}
  };
- let memories=[],media=[],currentMedia=null,previewUrl=null,refreshing=false,sequence=0;
+ let memories=[],media=[],currentMedia=null,previewUrl=null,sequence=0,loadSequence=0;
  const status=(msg,type)=>M.status('studio-message',msg,type);
  const finite=(v,fallback)=>Number.isFinite(Number(v))?Number(v):fallback;
  function selectedMemory(){return memories.find(x=>x.id===$('studio-memory').value);}
  function makeOption(value,label){const opt=document.createElement('option');opt.value=value;opt.textContent=label;return opt;}
- function settingsFromForm(){const settings={};fields.forEach(k=>settings[k]=finite($("studio-"+k).value,defaultSettings[k]));settings.zoom=settings.zoom/100;return settings;}
- function setForm(settings){const vals={...defaultSettings,...(settings||{})};fields.forEach(k=>{$('studio-'+k).value=k==='zoom'?Math.round(finite(vals[k],1)*100):finite(vals[k],defaultSettings[k]);});}
+ function settingsFromForm(){const settings={fit:$('studio-fit').value};fields.forEach(k=>settings[k]=finite($("studio-"+k).value,defaultSettings[k]));settings.zoom=settings.zoom/100;return window.MattiaPhoto.normalize(settings);}
+ function setForm(settings){const vals=window.MattiaPhoto.normalize(settings);$('studio-fit').value=vals.fit;fields.forEach(k=>{$('studio-'+k).value=k==='zoom'?Math.round(vals[k]*100):vals[k];});}
  function clearPreview(){sequence++;if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}const frame=$('studio-frame');frame.replaceChildren();const msg=document.createElement('p');msg.className='muted';msg.textContent='Seleziona una fotografia.';frame.appendChild(msg);}
  function applyPreview(){
-   const frame=$('studio-frame');frame.className='studio-photo-frame '+$('studio-layout').value;
+   const frame=$('studio-frame');frame.className='studio-photo-frame book-photo book-photo--'+$('studio-layout').value;
+   $('studio-preview-caption').textContent=$('studio-caption').value;
    const img=frame.querySelector('img');if(!img)return;
-   const s=settingsFromForm();
-   img.style.objectPosition=`${s.x}% ${s.y}%`;
-   img.style.transform=`scale(${s.zoom}) rotate(${s.rotate}deg)`;
-   img.style.filter=`brightness(${s.brightness}%) contrast(${s.contrast}%) saturate(${s.saturation}%) sepia(${s.sepia}%) grayscale(${s.grayscale}%)`;
+   window.MattiaPhoto.apply(img,settingsFromForm());
  }
  function renderSelectedMedia(){
    const item=media.find(x=>x.id===$('studio-media').value);currentMedia=item||null;
-   clearPreview();if(!item){status('Seleziona un ricordo con almeno una fotografia.');return;}
+   $('studio-save').disabled=!item;
+   const isImage=item?.media_kind==='image';
+   for(const key of [...fields,'fit','layout','preset','reset'])$('studio-'+key).disabled=!isImage;
+   clearPreview();if(!item){$('studio-caption').value='';$('studio-preview-caption').textContent='';status('Seleziona un ricordo con almeno una fotografia.');return;}
    $('studio-caption').value=item.caption||'';
    $('studio-sort').value=item.sort_order||0;
    $('studio-layout').value=['paper','polaroid','full','film','gallery','letter'].includes(item.layout)?item.layout:'paper';
@@ -97,11 +100,12 @@
    const request=sequence;
    status('Caricamento dell’anteprima privata…');
    M.sb.storage.from('mattia-album').download(item.storage_path).then(({data,error})=>{
-     if(request!==sequence || !currentMedia || currentMedia.id!==item.id)return;
+     if(request!==sequence || M.ctx.role!=='owner' || content.hidden || !currentMedia || currentMedia.id!==item.id)return;
      if(error)throw error;
      previewUrl=URL.createObjectURL(data);
      const img=document.createElement('img');img.alt='Fotografia privata da personalizzare';img.src=previewUrl;
-     $('studio-frame').replaceChildren(img);
+     const view=document.createElement('div');view.className='book-photo-window';view.appendChild(img);
+     $('studio-frame').replaceChildren(view);
      applyPreview();status('');
    }).catch(error=>{if(request===sequence)status('Impossibile caricare l’anteprima: '+M.readableError(error),'error');});
  }
@@ -115,33 +119,46 @@
    renderSelectedMedia();
  }
  async function loadStudio(){
-   if(refreshing||M.ctx.role!=='owner'||content.hidden)return;
-   refreshing=true;status('Aggiornamento delle fotografie…');
+   if(M.ctx.role!=='owner'||content.hidden)return;
+   const run=++loadSequence,access=M.ctx.accessVersion;
+   const active=()=>run===loadSequence && access===M.ctx.accessVersion && M.ctx.role==='owner' && !content.hidden;
+   clearPreview();currentMedia=null;$('studio-save').disabled=true;status('Aggiornamento delle fotografie…');
    try{
      const r=await Promise.all([
        M.sb.from('album_memories').select('id,title,memory_date,page_order,chapter_id').order('created_at'),
        M.sb.from('album_media').select('id,memory_id,storage_path,media_kind,caption,layout,photo_settings,sort_order').order('sort_order')
      ]);
+     if(!active())return;
      const err=r.find(x=>x.error);if(err)throw err.error;
      memories=r[0].data||[];media=r[1].data||[];
      const select=$('studio-memory'),old=select.value;select.replaceChildren();
      for(const m of memories)select.appendChild(makeOption(m.id,m.title));
      if(memories.some(x=>x.id===old))select.value=old;
      listMedia();if(!memories.length)status('Crea il primo ricordo nella sezione qui sopra, poi torna qui per personalizzare ogni foto.');
-   }catch(e){status('Impossibile caricare lo studio: '+M.readableError(e),'error');}
-   finally{refreshing=false;}
+   }catch(e){if(active())status('Impossibile caricare lo studio: '+M.readableError(e),'error');}
+ }
+ function clearStudio(){
+   ++loadSequence;panel.hidden=true;clearPreview();memories=[];media=[];currentMedia=null;
+   $('studio-memory').replaceChildren();$('studio-media').replaceChildren();
+   $('studio-caption').value='';$('studio-preview-caption').textContent='';status('');
+   $('studio-save').disabled=true;
  }
  function reevaluate(){
    const eligible=!content.hidden&&M.ctx.role==='owner';
-   if(!eligible){panel.hidden=true;clearPreview();return;}
+   if(!eligible){clearStudio();return;}
    if(panel.hidden){panel.hidden=false;loadStudio();}
  }
  const observer=new MutationObserver(reevaluate);
  observer.observe(content,{attributes:true,attributeFilter:['hidden']});
- window.addEventListener('pagehide',clearPreview);
+ document.addEventListener('mattia:access-cleared',clearStudio);
+ document.addEventListener('mattia:authorized',reevaluate);
+ window.addEventListener('pagehide',clearStudio);
+ window.addEventListener('pageshow',event=>{if(event.persisted)M.refresh();});
  $('studio-memory').addEventListener('change',listMedia);
  $('studio-media').addEventListener('change',renderSelectedMedia);
  $('studio-layout').addEventListener('change',applyPreview);
+ $('studio-fit').addEventListener('change',applyPreview);
+ $('studio-caption').addEventListener('input',applyPreview);
  fields.forEach(k=>$('studio-'+k).addEventListener('input',applyPreview));
  $('studio-preset').addEventListener('change',()=>{
    const p=presets[$('studio-preset').value]||presets.natural;
@@ -151,29 +168,31 @@
  $('studio-reload').addEventListener('click',loadStudio);
  $('studio-save').addEventListener('click',async()=>{
    if(M.ctx.role!=='owner'||content.hidden||!currentMedia)return;
+   const item=currentMedia,access=M.ctx.accessVersion;
    const button=$('studio-save');button.disabled=true;status('Salvataggio…');
    try{
      const caption=$('studio-caption').value.trim();
-     const payload={
-       caption,layout:$('studio-layout').value,
-       photo_settings:settingsFromForm(),
-       sort_order:Math.min(999,Math.max(0,Math.floor(finite($('studio-sort').value,0))))
-     };
-     const {data,error}=await M.sb.from('album_media').update(payload).eq('id',currentMedia.id).select('id');
+     const payload={caption,sort_order:Math.min(999,Math.max(0,Math.floor(finite($('studio-sort').value,0))))};
+     if(item.media_kind==='image')Object.assign(payload,{layout:$('studio-layout').value,photo_settings:settingsFromForm()});
+     const {data,error}=await M.sb.from('album_media').update(payload).eq('id',item.id).select('id');
+     if(access!==M.ctx.accessVersion || M.ctx.role!=='owner' || content.hidden)return;
      if(error)throw error;if(!data?.length)throw Error('Salvataggio non autorizzato.');
-     Object.assign(currentMedia,payload);
-     status('Fotografia personalizzata e salvata. ♡','ok');
-   }catch(e){status(M.readableError(e),'error');}
-   finally{button.disabled=false;}
+     Object.assign(item,payload);
+     if(currentMedia?.id===item.id)status('Fotografia personalizzata e salvata. ♡','ok');
+   }catch(e){if(access===M.ctx.accessVersion && M.ctx.role==='owner' && currentMedia?.id===item.id)status(M.readableError(e),'error');}
+   finally{button.disabled=!currentMedia || M.ctx.role!=='owner';}
  });
  $('studio-save-order').addEventListener('click',async()=>{
-   const m=selectedMemory();if(!m||M.ctx.role!=='owner')return;
+   const m=selectedMemory();if(!m||M.ctx.role!=='owner'||content.hidden)return;
+   const access=M.ctx.accessVersion;const button=$('studio-save-order');button.disabled=true;
    try{
      const order=Math.min(999,Math.max(0,Math.floor(finite($('studio-page-order').value,0))));
      const {data,error}=await M.sb.from('album_memories').update({page_order:order}).eq('id',m.id).select('id');
+     if(access!==M.ctx.accessVersion || M.ctx.role!=='owner' || content.hidden)return;
      if(error)throw error;if(!data?.length)throw Error('Salvataggio non autorizzato.');
      m.page_order=order;status('Posizione del ricordo aggiornata. ♡','ok');
-   }catch(e){status(M.readableError(e),'error');}
+   }catch(e){if(access===M.ctx.accessVersion && M.ctx.role==='owner')status(M.readableError(e),'error');}
+   finally{button.disabled=false;}
  });
  reevaluate();
 })();

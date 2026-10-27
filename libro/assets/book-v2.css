@@ -21,7 +21,7 @@
 .book-leaf--photo{justify-content:stretch;padding:28px 22px 43px;gap:15px;background:linear-gradient(#f9f2e6,#fdf9f1)}
 .book-photo{flex:1;min-height:0;display:flex;flex-direction:column;gap:7px;position:relative;max-height:635px}
 .book-photo-window{flex:1;min-height:0;position:relative;overflow:hidden;background:#e4dac9;display:flex;align-items:center;justify-content:center}
-.book-photo-image{display:block;width:100%;height:100%;min-height:100%;object-fit:cover;transition:filter .2s,transform .2s}
+.book-photo-image{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;transition:filter .2s,transform .2s}
 .book-photo-error:after{content:'Fotografia non disponibile';display:block;text-align:center;padding:25px;color:#7e6b58}
 .book-photo-open{position:absolute;bottom:12px;right:12px;border:1px solid #cfbd9e;border-radius:30px;background:rgba(255,250,241,.92);color:#695848;font-size:11px;padding:8px 14px;cursor:pointer}
 .book-photo-caption{min-height:66px;text-align:center;font:italic 19px/1.2 'Cormorant Garamond',Georgia,serif;color:#7d6c5d;display:flex;flex-direction:column;justify-content:center}
@@ -75,3 +75,17 @@
 @media(max-width:900px){.studio-grid{grid-template-columns:1fr}}
 @media(max-width:480px){.studio-photo-frame{height:300px}.studio-duo{grid-template-columns:1fr 1fr}.studio-preview{padding:15px}}
 @media(prefers-reduced-motion:reduce){.book-leaf,.book-photo-image{transition:none!important;animation:none!important}}
+/* Fixed page bounds keep large originals and long stories inside the book. */
+.book-spread{height:680px;min-height:0}
+.book-leaf{height:100%;min-height:0;max-height:none;min-width:0}
+.book-leaf-copy{min-height:0;max-height:100%;overflow:auto;overflow-wrap:anywhere}
+.book-photo-caption{flex:none;overflow-wrap:anywhere;max-height:125px;overflow:auto}
+.book-photo-window{aspect-ratio:4/5}
+.book-leaf:first-child{transform-origin:right center}
+.book-leaf:nth-child(2){transform-origin:left center}
+.studio-grid>div{min-width:0}
+.studio-photo-frame{aspect-ratio:4/5;height:auto;max-height:none;min-height:0;flex:none}
+.studio-photo-frame .book-photo-window{width:100%;height:100%;aspect-ratio:auto}
+.studio-photo-frame img{position:absolute;inset:0;width:100%;height:100%}
+@media(max-width:760px){.book-spread{height:570px}.book-leaf:first-child{transform-origin:left center}}
+@media(max-width:450px){.book-spread{height:530px}.studio-photo-frame{height:auto}}
