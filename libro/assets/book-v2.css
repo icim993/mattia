@@ -89,3 +89,27 @@
 .studio-photo-frame img{position:absolute;inset:0;width:100%;height:100%}
 @media(max-width:760px){.book-spread{height:570px}.book-leaf:first-child{transform-origin:left center}}
 @media(max-width:450px){.book-spread{height:530px}.studio-photo-frame{height:auto}}
+
+
+/* Tavole approvate: ogni PNG e' gia' una doppia pagina completa. */
+.book-leaf--approved{padding:0!important;min-height:0!important;border:0!important;background:#fcfaf5!important;overflow:hidden;box-shadow:none!important}
+.book-leaf--approved:first-child,.book-leaf--approved:nth-child(2){box-shadow:none!important;border:0!important}
+.book-approved-action{position:absolute;inset:0;display:block;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent;overflow:hidden;cursor:zoom-in}
+.book-approved-action:focus-visible{outline:4px solid #587258;outline-offset:-5px;z-index:2}
+.book-approved-image{position:absolute;top:0;left:0;display:block;width:200%;max-width:none;height:100%;object-fit:fill;pointer-events:none}
+.book-leaf--approved:has(.book-approved-image) + .book-leaf--approved .book-approved-image{left:-100%}
+.book-leaf--approved-right .book-approved-image{left:-100%}
+.book-stage:has(.book-leaf--approved) .book-spine{display:none}
+.book-approved-error:after{content:'Tavola non disponibile';position:absolute;inset:40% 0 auto;text-align:center;color:#6f6152;font-size:16px}
+.approved-panel{border:1px solid #b8c3ad;background:linear-gradient(145deg,#fffdf8,#f9f7ef)}
+.approved-draft{display:grid;gap:14px}
+.approved-draft-item{display:grid;grid-template-columns:minmax(100px,220px) minmax(0,1fr);align-items:center;gap:18px;padding:14px;border:1px solid #d9d4c8;border-radius:10px;background:#fffdf7}
+.approved-preview{display:block;width:100%;aspect-ratio:1.38;object-fit:contain;box-shadow:0 5px 15px #e1dad0;background:#efebe4}
+.approved-draft-fields{display:grid;gap:11px;min-width:0}
+.approved-draft-fields label{display:grid;gap:4px;font-size:13px;color:#625b4c}
+.approved-draft-fields input[type=number]{width:115px;max-width:100%}
+.approved-existing{margin:18px 0 0;border-top:1px solid #ded8cc;padding-top:14px}
+.approved-existing h3{font:600 25px 'Cormorant Garamond',Georgia,serif;margin:0 0 12px}
+.approved-existing-item{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid #ebe5d9;font-size:14px;color:#574e42}
+.approved-order-pill{min-width:30px;height:30px;display:grid;place-items:center;border:1px solid #bac6b4;border-radius:50%;color:#55664c;font-weight:700}
+@media(max-width:600px){.approved-draft-item{grid-template-columns:1fr}.approved-preview{max-width:100%}}
