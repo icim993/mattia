@@ -60,7 +60,7 @@
     }
     const {page,context,errors}=await open('libro/admin/',390,'owner',false);
     await page.locator('#approved-panel').waitFor({state:'visible'});
-    await page.locator('#approved-chapter option').first().waitFor();
+    await page.locator('#approved-chapter option').first().waitFor({state:'attached'});
     assert.equal(await page.locator('#approved-chapter').inputValue(),'1');
     const uploads=['01_Il_primo_segno.png','02_La_scelta_del_nome.png','03_La_prima_volta_che_ti_abbiamo_visto.png'].map(name=>({name,mimeType:'image/png',buffer:png}));
     await page.locator('#approved-files').setInputFiles(uploads);
