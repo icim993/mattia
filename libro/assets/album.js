@@ -103,6 +103,7 @@
 }
   function makeLeaf(page,globalNumber) {
     const leaf=section('article',`book-leaf book-leaf--${page.type}`);
+    if(page.type==='approved')leaf.classList.add('book-leaf--approved-'+page.side);
     leaf.setAttribute('aria-label',`Pagina ${globalNumber}`);
     if(page.type==='chapter'){
       leaf.appendChild(section('span','book-bloom','✳'));
