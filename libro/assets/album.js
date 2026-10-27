@@ -18,15 +18,26 @@
   function chapterPages(chapterId) {
     const chapter = state.chapters.find(x=>x.id===chapterId);
     if (!chapter) return [];
-    const result = [{type:'chapter',chapter}];
+    const result = [];
     const memories = state.memories.filter(x=>x.chapter_id===chapterId).sort((a,b)=>{
       const ao=a.page_order===null||a.page_order===undefined?9999:Number(a.page_order);
       const bo=b.page_order===null||b.page_order===undefined?9999:Number(b.page_order);
       return ao-bo || String(a.memory_date).localeCompare(String(b.memory_date)) || String(a.created_at).localeCompare(String(b.created_at));
     });
+    const approvedFor=memory=>memoryMedia(memory.id).filter(media=>media.media_kind==='image'&&media.photo_settings?.approved_spread===true);
+    if(!memories.length || !approvedFor(memories[0]).length)result.push({type:'chapter',chapter});
     memories.forEach(memory=>{
-      result.push({type:'story',memory});
-      memoryMedia(memory.id).forEach((media,index)=>result.push({type:'photo',memory,media,index}));
+      const spreads=approvedFor(memory);
+      if(spreads.length){
+        if(result.length%2)result.push({type:'blank'});
+        spreads.forEach((media,index)=>{
+          result.push({type:'approved',memory,media,index,side:'left'});
+          result.push({type:'approved',memory,media,index,side:'right'});
+        });
+      }else{
+        result.push({type:'story',memory});
+        memoryMedia(memory.id).forEach((media,index)=>result.push({type:'photo',memory,media,index}));
+      }
     });
     // Only the two owners may read guestbook texts. The public song view is never
     // used as a backdoor to the private board, even when the chapter is visible.
@@ -78,6 +89,18 @@
     if(media.caption)caption.appendChild(section('p','',media.caption));
     leaf.appendChild(caption);
   }
+  function approvedLeaf(leaf,page){
+ const {memory,media,side}=page;
+ const button=section('button','book-approved-action');
+ button.type='button';button.setAttribute('aria-label','Apri la tavola completa: '+memory.title);
+ const img=section('img','book-approved-image');
+ img.alt=memory.title+' — '+(side==='left'?'pagina sinistra':'pagina destra');
+ img.loading='eager';img.decoding='async';
+ button.appendChild(img);leaf.appendChild(button);
+ button.addEventListener('click',()=>M.openLightbox([media]));
+ M.secureMediaUrl(media.storage_path).then(url=>{if(img.isConnected)img.src=url;})
+   .catch(()=>{if(img.isConnected){img.alt='Tavola non disponibile';leaf.classList.add('book-approved-error');}});
+}
   function makeLeaf(page,globalNumber) {
     const leaf=section('article',`book-leaf book-leaf--${page.type}`);
     leaf.setAttribute('aria-label',`Pagina ${globalNumber}`);
@@ -91,6 +114,8 @@
       leaf.appendChild(section('div','book-script','Con amore, mamma e papà'));
     } else if(page.type==='photo') {
       photoPage(leaf,page);
+    } else if(page.type==='approved') {
+      approvedLeaf(leaf,page);
     } else if(page.type==='guestbook'){
       leafHeading(leaf,`UN PENSIERO PER MATTIA · ${new Date(page.entry.created_at).toLocaleDateString('it-IT')}`,
         `Da ${page.entry.nome || 'una persona cara'}`,
@@ -99,7 +124,7 @@
       leaf.appendChild(section('div','book-end-signet','♡'));
       leafHeading(leaf,'IL NOSTRO RACCONTO','E la storia continua…','Ogni giorno un nuovo ricordo, ogni istante una pagina da custodire.');
     }
-    leaf.appendChild(section('span','book-leaf-number',String(globalNumber).padStart(2,'0')));
+    if(page.type!=='approved'&&page.type!=='blank')leaf.appendChild(section('span','book-leaf-number',String(globalNumber).padStart(2,'0')));
     return leaf;
   }
   function buildBook(pages,perSpread){
@@ -109,6 +134,13 @@
     const spread=section('div','book-spread');
     const visible=pages.slice(state.pageIndex,state.pageIndex+perSpread);
     visible.forEach((p,i)=>spread.appendChild(makeLeaf(p,state.pageIndex+i+1)));
+    if(visible.length && visible.every(p=>p.type==='approved')){
+      const settings=visible[0].media.photo_settings||{};
+      const w=Number(settings.spread_width)||1408,h=Number(settings.spread_height)||1024;
+      const width=Math.max(100,Math.min(12000,w)),height=Math.max(100,Math.min(12000,h));
+      spread.style.height='auto';
+      spread.style.aspectRatio=(perSpread===2?width:width/2)+' / '+height;
+    }
     if(perSpread===2 && visible.length===1){const blank=section('div','book-leaf book-leaf--blank');blank.appendChild(section('span','book-bloom','✳'));spread.appendChild(blank);}
     list.append(spread,spine);
   }
@@ -136,9 +168,17 @@
     const per=mobile.matches?1:2;
     state.pageIndex=Math.min(Math.floor(state.pageIndex/per)*per,Math.max(0,Math.floor((pages.length-1)/per)*per));
     buildBook(pages,per);
-    $('page-count').textContent=per===2?
-      `Pagine ${state.pageIndex+1}–${Math.min(state.pageIndex+2,pages.length)} di ${pages.length}`:
-      `Pagina ${state.pageIndex+1} di ${pages.length}`;
+    const shown=pages.slice(state.pageIndex,state.pageIndex+per);
+    if(shown.length&&shown.every(x=>x.type==='approved')){
+      const total=pages.filter(x=>x.type==='approved'&&x.side==='left').length;
+      const previous=pages.slice(0,state.pageIndex).filter(x=>x.type==='approved'&&x.side==='left').length;
+      const number=previous+(shown[0].side==='left'?1:0);
+      $('page-count').textContent='Tavola '+number+' di '+total+(per===1?' · lato '+(shown[0].side==='left'?'sinistro':'destro'):'');
+    }else{
+      $('page-count').textContent=per===2?
+        `Pagine ${state.pageIndex+1}–${Math.min(state.pageIndex+2,pages.length)} di ${pages.length}`:
+        `Pagina ${state.pageIndex+1} di ${pages.length}`;
+    }
     $('page-nav').hidden=false;
     $('prev-page').disabled=state.pageIndex===0;
     $('next-page').disabled=state.pageIndex+per>=pages.length;
