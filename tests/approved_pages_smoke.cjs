@@ -3,7 +3,7 @@
   const assert=require('node:assert/strict');
   const {chromium}=require('playwright');
   const {server,mock}=require('./pages_smoke.cjs');
-  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aO1sAAAAASUVORK5CYII=','base64');
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAFUlEQVR4nGP8+uH5fwYkwMSABjAEALi3A9FMXDS3AAAAAElFTkSuQmCC','base64');
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base='http://127.0.0.1:'+server.address().port+'/mattia/';
   let browser;
@@ -79,7 +79,7 @@
     assert.deepEqual(memories.map(x=>x.page_order),[1,2,3]);
     assert.ok(media.every(x=>x.photo_settings.approved_spread && x.mime_type==='image/png'));
     assert.ok(media.every(x=>x.storage_path.startsWith('u1/')));
-    assert.ok(media.every(x=>x.photo_settings.spread_width===1));
+    assert.ok(media.every(x=>x.photo_settings.spread_width===4));
     await page.locator('#logout-button').click();
     assert.equal(await page.locator('#approved-panel').isVisible(),false);
     assert.equal(await page.locator('.approved-draft-item').count(),0);
