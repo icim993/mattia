@@ -67,7 +67,9 @@
     assert.equal(await page.locator('.approved-draft-item').count(),3);
     assert.deepEqual(await page.locator('[data-approved-order]').evaluateAll(inputs=>inputs.map(x=>x.value)),['1','2','3']);
     await page.locator('#approved-submit').click();
-    await page.waitForFunction(()=>document.querySelector('#approved-status')?.textContent.includes('3 tavole pubblicate'));
+    await page.waitForFunction(()=>{const e=document.querySelector('#approved-status');return e&&(e.textContent.includes('3 tavole pubblicate')||e.classList.contains('error'));},null,{timeout:12000});
+    const uploadStatus=await page.locator('#approved-status').innerText();
+    assert.match(uploadStatus,/3 tavole pubblicate/,JSON.stringify({status:uploadStatus,writes:await page.evaluate(()=>window.testWrites)}));
     const writes=await page.evaluate(()=>window.testWrites);
     assert.equal(writes.filter(w=>w.bucket==='mattia-album').length,3);
     assert.equal(writes.filter(w=>w.table==='album_memories').length,1);
