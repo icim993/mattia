@@ -130,7 +130,7 @@
      ]);
      if(!active())return;
      const err=r.find(x=>x.error);if(err)throw err.error;
-     memories=r[0].data||[];media=r[1].data||[];
+     media=(r[1].data||[]).filter(x=>x.photo_settings?.approved_spread!==true);memories=(r[0].data||[]).filter(m=>media.some(x=>x.memory_id===m.id));
      const select=$('studio-memory'),old=select.value;select.replaceChildren();
      for(const m of memories)select.appendChild(makeOption(m.id,m.title));
      if(memories.some(x=>x.id===old))select.value=old;
