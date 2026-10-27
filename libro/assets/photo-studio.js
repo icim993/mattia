@@ -112,7 +112,7 @@
  function listMedia(){
    const id=$('studio-memory').value;
    const select=$('studio-media'),old=select.value;select.replaceChildren();
-   const items=media.filter(x=>x.memory_id===id).sort((a,b)=>a.sort_order-b.sort_order);
+   const items=media.filter(x=>x.memory_id===id && x.photo_settings?.approved_spread!==true).sort((a,b)=>a.sort_order-b.sort_order);
    items.forEach((x,i)=>select.appendChild(makeOption(x.id,`${x.media_kind==='video'?'Video':'Foto'} ${i+1}${x.caption?' · '+x.caption.slice(0,32):''}`)));
    if(items.some(x=>x.id===old))select.value=old;
    const m=selectedMemory();$('studio-page-order').value=m?.page_order??0;
