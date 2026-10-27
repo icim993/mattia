@@ -1,5 +1,22 @@
 # Il libro di Mattia — integrazione V1
 
+## V2 — collaudo del 27 ottobre 2026
+
+Ripresa dalla PR #1, senza cambiare `index.html` o le funzioni pubbliche. Il libro presenta due pagine su desktop e una su smartphone, con swipe, animazioni annullabili, navigazione tra capitoli e supporto a movimento ridotto. Testi lunghi restano leggibili scorrendo all'interno della pagina. Le foto possono essere mostrate intere oppure ritagliate.
+
+Lo studio è riservato agli owner: ogni foto ha didascalia, cornice, inquadratura, zoom, rotazione, luminosità, contrasto, colore e preset propri. Anteprima e libro condividono il motore di resa. Il salvataggio modifica soltanto i metadati privati, mai i byte del file nel bucket. Download e caricamenti ancora in corso vengono ignorati al cambio di sessione. Per i video restano modificabili didascalia e ordine.
+
+Collaudi completati:
+
+- 13 test Python; 28 scenari browser di regressione e 12 scenari specifici V2, comprese larghezze 320/390/768/1366, swipe, ridimensionamento, cambio capitolo durante l'animazione, salvataggio individuale, errori e logout durante le richieste.
+- 45 verifiche RLS sul database reale con owner, viewer, contributor, non invitato e anonimo. Fixture e tentativi di scrittura racchiusi in transazioni annullate con rollback.
+- Login con password, verifica ruolo e refresh token reali con quattro account sintetici isolati. Verificati capitoli nascosti, salvataggio metadati solo owner, download autenticati, revoca e identità dei byte originali prima/dopo la modifica.
+- Tutti gli account, le sessioni, i permessi e i contenuti sintetici dei test Auth/Storage sono stati rimossi; nessun account proprietario reale è stato modificato. Nessuna migrazione eseguita.
+
+Il collaudo ha rilevato che una risposta Storage già scaricata può essere ancora servita dalla cache dopo la revoca. L'app usa ora `cache: no-store` e un `cacheNonce` distinto per ogni download autenticato, così ogni nuova richiesta è verificata dal server. I test reali confermano che le richieste nuove e i file mai scaricati sono negati dopo la revoca. **Copie già ricevute o memorizzate fuori dall'app non sono revocabili.** Il bypass segue la [documentazione Storage CDN](https://supabase.com/docs/guides/storage/cdn/smart-cdn#bypassing-cache).
+
+Le credenziali amministrative sono lette solo da un file locale esterno tramite `MATTIA_DB_PASSWORD_FILE`; non sono incluse nel repository o nella CI. I test live sono comandi manuali (`python tests/live_rls_check.py`, `python tests/live_auth_check.py`). La CI esegue solo fixture browser e contratti statici, senza credenziali o accesso ai contenuti familiari. Per ripetere i test browser: `npm ci`, `npx playwright install chromium`, `npm run test:browser`.
+
 ## Accesso rapido e inviti
 
 Il collegamento pubblico all'album è nel footer della home: `♡ Il libro di Mattia · Album privato`, con percorso relativo `./libro/`. L'accesso email/password è subito visibile nel libro e nell'amministrazione. La sessione e il refresh dei token restano gestiti da Supabase; il sito non salva password e mantiene i campi compatibili con il gestore password del browser. Google, link email e OTP restano disponibili.

@@ -91,6 +91,7 @@
   }
   function message(id, text, kind) { M.status(id,text,kind); }
   async function loadAll() {
+    const accessVersion=M.ctx.accessVersion;
     const queries = [
       M.sb.from('album_chapters').select('id,title,subtitle,visible').order('id'),
       M.sb.from('album_memories').select('id,title,body,chapter_id,memory_date,created_at,created_by').order('memory_date',{ascending:false}),
@@ -98,6 +99,7 @@
     ];
     if (M.ctx.role === 'owner') queries.push(M.sb.from('album_access').select('email,display_name,role,active').order('role').order('email'));
     const res = await Promise.all(queries);
+    if(accessVersion!==M.ctx.accessVersion || !['owner','contributor'].includes(M.ctx.role)) return;
     const bad = res.find(x => x.error); if (bad) throw bad.error;
     data.chapters = res[0].data || []; data.memories = res[1].data || []; data.media = res[2].data || [];
     data.access = M.ctx.role === 'owner' ? (res[3].data || []) : [];

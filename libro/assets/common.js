@@ -2,15 +2,28 @@
 (function (global) {
   'use strict';
   const cfg = global.MATTIA_CONFIG || {};
+  function sessionFetch(input, init = {}) {
+    const url = new URL(typeof input === 'string' ? input : input.url);
+    const method = init.method || (typeof input === 'string' ? 'GET' : input.method) || 'GET';
+    if (method.toUpperCase() === 'GET' && url.origin === new URL(cfg.url).origin &&
+        /^\/storage\/v1\/(?:object|render\/image)\/authenticated\//.test(url.pathname)) {
+      url.searchParams.set('cacheNonce', global.crypto.randomUUID());
+      const request = typeof input === 'string' ? url.href : new Request(url.href, input);
+      return global.fetch(request, { ...init, cache: 'no-store' });
+    }
+    return global.fetch(input, init);
+  }
   const configured = !!(cfg.url && cfg.anonKey && !cfg.url.includes('__SUPABASE_') && !cfg.anonKey.includes('__SUPABASE_'));
   const sb = configured && global.supabase ? global.supabase.createClient(cfg.url, cfg.anonKey, {
+    global: { fetch: sessionFetch },
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'mattia-family-book-session' }
   }) : null;
   const $ = (id) => document.getElementById(id);
   const bookBase = new URL(document.querySelector('meta[name="book-base"]')?.content || './', location.href);
   const mediaCache = new Map();
   const mediaPromises = new Map();
-  const ctx = { sb, bookBase, user: null, role: null, signedInEmail: null };
+  let mediaVersion = 0;
+  const ctx = { sb, bookBase, user: null, role: null, signedInEmail: null, accessVersion:0 };
 
   function node(tag, className, content) {
     const e = document.createElement(tag);
@@ -37,6 +50,7 @@
     if (box) { box.hidden = true; empty($('lightbox-media')); document.body.style.overflow = ''; }
   }
   function revokeMedia() {
+    ++mediaVersion;
     closeMedia();
     for (const url of mediaCache.values()) URL.revokeObjectURL(url);
     mediaCache.clear(); mediaPromises.clear();
@@ -45,15 +59,17 @@
     if (mediaCache.has(storagePath)) return mediaCache.get(storagePath);
     if (mediaPromises.has(storagePath)) return mediaPromises.get(storagePath);
     if (!sb || !ctx.role) throw new Error('Accesso privato non disponibile.');
+    const version=mediaVersion;
     const promise = (async () => {
       const { data, error } = await sb.storage.from('mattia-album').download(storagePath);
       if (error) throw error;
+      if (version !== mediaVersion || !ctx.role) throw new Error('Sessione cambiata.');
       const url = URL.createObjectURL(data);
       mediaCache.set(storagePath, url);
       return url;
     })();
     mediaPromises.set(storagePath, promise);
-    try { return await promise; } finally { mediaPromises.delete(storagePath); }
+    try { return await promise; } finally { if(mediaPromises.get(storagePath)===promise) mediaPromises.delete(storagePath); }
   }
   async function openLightbox(mediaList) {
     const box = $('lightbox'), target = $('lightbox-media');
@@ -74,7 +90,10 @@
   }
 
   function showArea(area) {
-    if (area !== 'private-content') handler?.onAccessCleared?.();
+    if (area !== 'private-content') {
+      handler?.onAccessCleared?.();
+      document.dispatchEvent(new CustomEvent('mattia:access-cleared'));
+    }
     for (const id of ['gate','denied','private-content']) {
       const el = $(id); if (el) el.hidden = id !== area;
     }
@@ -83,6 +102,7 @@
   }
   async function signOut() {
     ++refreshCounter;
+    ++ctx.accessVersion;
     ctx.user = null; ctx.role = null; revokeMedia(); showArea('gate');
     if (sb) await sb.auth.signOut();
     status('auth-message', 'Hai effettuato la disconnessione.', 'ok');
@@ -145,7 +165,8 @@
   let refreshCounter = 0;
   async function refresh() {
     const thisRun = ++refreshCounter;
-    handler?.onAccessCleared?.();
+    ++ctx.accessVersion;
+    revokeMedia(); ctx.user=null; ctx.role=null; showArea('gate');
     if (!sb) { showArea('gate'); status('auth-message','Configurazione non ancora attivata: esegui apply_to_repo.py.','error'); return; }
     try {
       const sessionResult = await sb.auth.getSession();
@@ -170,6 +191,7 @@
       if ($('welcome-name')) $('welcome-name').textContent = (ctx.role === 'owner' ? 'Marco e Angela' : 'Ciao') ;
       if ($('role-label')) $('role-label').textContent = ctx.role === 'owner' ? 'Genitore' : ctx.role === 'contributor' ? 'Collaboratore' : 'Famiglia';
       showArea('private-content');
+      document.dispatchEvent(new CustomEvent('mattia:authorized'));
       if (handler?.onAuthorized) await handler.onAuthorized({ ...ctx });
     } catch (error) {
       if (thisRun !== refreshCounter) return;

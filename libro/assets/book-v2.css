@@ -1,0 +1,91 @@
+/* Libro di Mattia V2. Pagina reale + atelier fotografico. No originali nel codice. */
+:root { --book-ivory:#fffcf5; --book-sand:#e7dfd1; --book-ink:#55483d; --book-olive:#899481; }
+.book-stage{display:block;position:relative;max-width:1100px;margin:22px auto 12px;padding:14px;background:#ae9880;border:1px solid #bba98d;border-radius:11px;box-shadow:0 24px 44px rgba(74,56,41,.18),0 4px 0 #937d63;perspective:1600px;isolation:isolate}
+.book-stage:before{content:"";position:absolute;inset:6px;pointer-events:none;border:2px solid rgba(253,245,226,.32);border-radius:6px}
+.book-spread{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;min-height:610px;background:var(--book-ivory);box-shadow:inset 0 0 0 1px #ded3bd}
+.book-spine{position:absolute;top:14px;bottom:14px;left:50%;width:14px;transform:translateX(-50%);pointer-events:none;z-index:5;background:linear-gradient(90deg,rgba(63,45,23,.12),rgba(255,255,255,.37) 30%,rgba(52,38,19,.12) 68%,transparent)}
+.book-leaf{color:var(--book-ink);position:relative;display:flex;flex-direction:column;justify-content:center;min-height:610px;max-height:760px;overflow:hidden;padding:48px 40px 52px;background:radial-gradient(circle at 6% 13%,rgba(228,222,206,.28),transparent 45%),linear-gradient(105deg,#fbf6eb 0%,#fffdf8 62%,#f3ebdc 100%);border:1px solid rgba(102,82,54,.12);transform-style:preserve-3d;backface-visibility:hidden}
+.book-leaf:nth-child(1){border-right:1px solid rgba(78,60,33,.13);box-shadow:inset -13px 0 17px -19px #79634b}
+.book-leaf:nth-child(2){border-left:1px solid rgba(78,60,33,.13);box-shadow:inset 13px 0 17px -19px #79634b}
+.book-leaf-copy{max-width:450px;overflow:auto;scrollbar-width:thin;max-height:95%}
+.book-leaf--chapter,.book-leaf--end{text-align:center;align-items:center;background:radial-gradient(ellipse at 90% 10%,#ecf1e7,transparent 48%),#faf4e9}
+.book-leaf--chapter .book-leaf-copy,.book-leaf--end .book-leaf-copy{text-align:center}
+.book-kicker{font-size:11px;letter-spacing:.2em;color:#98856f;text-transform:uppercase;margin:0 0 18px;font-weight:700}
+.book-leaf-title{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:clamp(35px,3.5vw,62px);line-height:1.04;letter-spacing:-.035em;color:#5d5349;margin:0 0 24px}
+.book-leaf-body{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(19px,1.7vw,25px);line-height:1.43;white-space:pre-wrap;color:#786a5e;margin:0}
+.book-leaf-number{position:absolute;bottom:19px;left:50%;transform:translateX(-50%);font:12px 'DM Sans',Arial,sans-serif;color:#b9ab9b;letter-spacing:.16em}
+.book-bloom{font:70px Georgia,serif;color:#c9b79d;margin-bottom:36px;line-height:1}
+.book-ornament{color:#ad9680;margin-top:55px;letter-spacing:.6em}
+.book-script{font:italic 21px 'Cormorant Garamond',Georgia,serif;color:#9e8a72;margin-top:40px}
+.book-end-signet{font-size:44px;color:#a9b19c;margin-bottom:30px}
+.book-leaf--photo{justify-content:stretch;padding:28px 22px 43px;gap:15px;background:linear-gradient(#f9f2e6,#fdf9f1)}
+.book-photo{flex:1;min-height:0;display:flex;flex-direction:column;gap:7px;position:relative;max-height:635px}
+.book-photo-window{flex:1;min-height:0;position:relative;overflow:hidden;background:#e4dac9;display:flex;align-items:center;justify-content:center}
+.book-photo-image{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;transition:filter .2s,transform .2s}
+.book-photo-error:after{content:'Fotografia non disponibile';display:block;text-align:center;padding:25px;color:#7e6b58}
+.book-photo-open{position:absolute;bottom:12px;right:12px;border:1px solid #cfbd9e;border-radius:30px;background:rgba(255,250,241,.92);color:#695848;font-size:11px;padding:8px 14px;cursor:pointer}
+.book-photo-caption{min-height:66px;text-align:center;font:italic 19px/1.2 'Cormorant Garamond',Georgia,serif;color:#7d6c5d;display:flex;flex-direction:column;justify-content:center}
+.book-photo-caption p{margin:5px auto 0;max-width:95%;font-size:18px}
+.book-photo-collection{text-transform:uppercase;font:700 9px 'DM Sans',Arial,sans-serif;letter-spacing:.11em;color:#ab9a88}
+.book-photo--polaroid{padding:15px 14px 23px;background:#fff;box-shadow:0 12px 28px -16px #6e6255;transform:rotate(-1deg)}
+.book-photo--paper{padding:13px;background:#f8f4ec;border:1px solid #d6c9b5}
+.book-photo--film{background:#302b26;padding:22px 12px;box-shadow:0 0 0 1px #5f584e}
+.book-photo--film:before,.book-photo--film:after{content:'••••••••••••••••';letter-spacing:.28em;line-height:22px;font-size:11px;color:#dcc8ac;text-align:center}
+.book-photo--gallery{border:13px solid #ebdfd0;box-shadow:inset 0 0 0 2px #d4bea0,0 8px 24px #d0c0ac}
+.book-photo--letter{padding:16px 18px 22px;background:linear-gradient(150deg,#f9ead8,#e5d0bc);transform:rotate(1.1deg)}
+.book-photo--full .book-photo-window{border-radius:1px}
+.book-video-open{background:#e0d2c0;border:0;border-radius:40px;padding:16px 23px;color:#665340;font-size:14px;cursor:pointer}
+.page-nav:has(+ .book-stage),.page-nav{position:relative}
+.page-nav{max-width:1000px}
+.book-stage .book-spread .book-leaf--blank{background:#f9f4e9;text-align:center}
+@media(max-width:760px){
+ .book-stage{padding:8px;max-width:490px;margin:22px auto;box-shadow:0 18px 32px rgba(74,56,41,.18)}
+ .book-spread{grid-template-columns:minmax(0,1fr);min-height:570px}
+ .book-spine{display:none}
+ .book-leaf{min-height:570px;max-height:calc(92vh - 130px);padding:38px 29px 46px}
+ .book-leaf--photo{padding:16px 15px 37px}
+ .book-leaf-body{font-size:21px}.book-leaf-title{font-size:45px}
+ .book-photo{max-height:calc(92vh - 220px)}
+}
+@media(max-width:450px){
+ .book-stage{margin-left:-6px;margin-right:-6px;padding:7px}
+ .book-leaf{min-height:515px;max-height:620px;padding:33px 24px 44px}
+ .book-leaf--photo{padding:12px 12px 35px;min-height:515px}
+ .book-leaf-title{font-size:41px}.book-leaf-body{font-size:20px}
+ .book-photo-caption{font-size:17px;min-height:48px}
+}
+/* Photo atelier. All styling metadata is private and editable only for owners. */
+.photo-studio-panel{margin-top:24px}
+.studio-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:start}
+.studio-preview{border:1px solid #d9cbb9;background:#e9dfd1;padding:23px;min-height:375px;display:grid;place-items:center}
+.studio-photo-frame{width:100%;max-width:370px;height:350px;overflow:hidden;background:#c9b9a5;position:relative;display:grid;place-items:center}
+.studio-photo-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.studio-photo-frame.polaroid{border:16px solid white;border-bottom-width:40px;transform:rotate(-1deg);box-shadow:0 10px 26px #b9aa93}
+.studio-photo-frame.paper{border:13px solid #f9f2e8;box-shadow:0 6px 23px #bcac9b}
+.studio-photo-frame.film{border:16px solid #302b26;border-top-width:28px;border-bottom-width:28px}
+.studio-photo-frame.gallery{border:17px solid #e2d5c4;box-shadow:inset 0 0 0 3px #c8bba6}
+.studio-photo-frame.letter{border:18px solid #ead8bd;transform:rotate(1deg)}
+.studio-controls{display:grid;gap:12px}
+.studio-controls label{display:grid;gap:5px;color:#6c5e51;font-size:12px;font-weight:600}
+.studio-controls input[type=range]{accent-color:#8b9985;width:100%}
+.studio-duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.studio-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:13px}
+.studio-note{font-size:12px;color:#9d846d;margin:0}
+.studio-preview-label{font-size:11px;letter-spacing:.1em;color:#8a7662;text-align:center}
+@media(max-width:900px){.studio-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.studio-photo-frame{height:300px}.studio-duo{grid-template-columns:1fr 1fr}.studio-preview{padding:15px}}
+@media(prefers-reduced-motion:reduce){.book-leaf,.book-photo-image{transition:none!important;animation:none!important}}
+/* Fixed page bounds keep large originals and long stories inside the book. */
+.book-spread{height:680px;min-height:0}
+.book-leaf{height:100%;min-height:0;max-height:none;min-width:0}
+.book-leaf-copy{min-height:0;max-height:100%;overflow:auto;overflow-wrap:anywhere}
+.book-photo-caption{flex:none;overflow-wrap:anywhere;max-height:125px;overflow:auto}
+.book-photo-window{aspect-ratio:4/5}
+.book-leaf:first-child{transform-origin:right center}
+.book-leaf:nth-child(2){transform-origin:left center}
+.studio-grid>div{min-width:0}
+.studio-photo-frame{aspect-ratio:4/5;height:auto;max-height:none;min-height:0;flex:none}
+.studio-photo-frame .book-photo-window{width:100%;height:100%;aspect-ratio:auto}
+.studio-photo-frame img{position:absolute;inset:0;width:100%;height:100%}
+@media(max-width:760px){.book-spread{height:570px}.book-leaf:first-child{transform-origin:left center}}
+@media(max-width:450px){.book-spread{height:530px}.studio-photo-frame{height:auto}}

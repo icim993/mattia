@@ -17,7 +17,7 @@ const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
   res.end(fs.readFileSync(file));
 });
-function mock({role=null, signedIn=false, born=false, unavailable=false, boardError=false, passwordRole='viewer'}) {
+function mock({role=null, signedIn=false, born=false, unavailable=false, boardError=false, passwordRole='viewer',v2=false}) {
   window.testCalls = [];
   window.testWrites = [];
   window.testDownloads = [];
@@ -37,8 +37,14 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
     ],
     album_chapters:chapters,
     album_memories:[{id:'m1',chapter_id:1,title:'Ricordo di prova',body:'Testo di prova',memory_date:'2026-10-26',created_by:'u1'}],
-    album_media:[], album_access:[{email:'owner@example.test',role:'owner',display_name:'Test',active:true}]
+    album_media:v2 ? [
+      {id:'photo1',memory_id:'m1',media_kind:'image',storage_path:'test/photo-one.png',sort_order:0,caption:'Prima foto',layout:'paper',photo_settings:{}},
+      {id:'photo2',memory_id:'m1',media_kind:'image',storage_path:'test/photo-two.png',sort_order:1,caption:'Seconda foto',layout:'polaroid',photo_settings:{brightness:110}},
+      {id:'video1',memory_id:'m1',media_kind:'video',storage_path:'test/video.mp4',sort_order:2,caption:'Video di prova',layout:'paper',photo_settings:{}}
+    ] : [], album_access:[{email:'owner@example.test',role:'owner',display_name:'Test',active:true}]
   };
+  window.testRows=rows;
+  window.testSetRole=value=>{role=value;signedIn=!!value};
   window.supabase = {createClient:(url,key,options)=>{window.testClientOptions=options;return {
     auth:{getSession:async()=>({data:{session:signedIn?{}:null}}),
       getUser:async()=>({data:{user:signedIn?{id:'u1',email:'owner@example.test'}:null}}),
@@ -56,16 +62,19 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
         insert(row){window.testWrites.push({table,row});result={data:{id:'m2',...row},error:null};return q},
         maybeSingle(){return Promise.resolve(result)},
         single(){return Promise.resolve({...result,data:Array.isArray(result.data)?result.data[0]:result.data})},
-        then(a,b){return Promise.resolve(result).then(a,b)}};
+        then(a,b){
+          const snapshot=structuredClone(result);
+          return new Promise(resolve=>setTimeout(()=>resolve(window.testQueryError===table ? {data:null,error:{message:'Query failed'}} : snapshot),window.testQueryDelay||0)).then(a,b);
+        }};
       return q;
     },storage:{from:bucket=>({
-      download:async path=>{window.testDownloads.push({bucket,path});return {data:new Blob([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aO1sAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],{type:'image/png'})}},
+      download:async path=>{window.testDownloads.push({bucket,path});await new Promise(resolve=>setTimeout(resolve,window.testDownloadDelay||0));if(window.testDownloadError)return {error:{message:'Download failed'}};return {data:new Blob([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aO1sAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],{type:'image/png'})}},
       upload:async(path,blob)=>{window.testWrites.push({bucket,path,size:blob.size});return {error:null}},
       getPublicUrl:path=>({data:{publicUrl:'https://example.supabase.co/storage/v1/object/public/foto/'+path}})
     })}
   }}};
 }
-(async()=>{
+async function runSmoke(){
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base = `http://127.0.0.1:${server.address().port}/mattia/`;
   let browser;
@@ -157,6 +166,7 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
           await page.locator('.chapter-card').first().waitFor();
           assert.equal(await page.locator('#admin-link').isVisible(),scenario.role==='owner');
           await page.locator('.chapter-card').first().click();
+          if(width<=760)await page.locator('#next-page').click();
           assert.match(await page.locator('#memories-list').innerText(),/Ricordo di prova/);
           if (scenario.role==='owner') {
             await page.locator('#admin-link').click();
@@ -243,4 +253,6 @@ function mock({role=null, signedIn=false, born=false, unavailable=false, boardEr
     assert.deepEqual(missing,[]);
     console.log('PASS: 28 browser scenarios; password login/session restore, WhatsApp invites/clipboard fallback/revoke/reactivate, privacy, public forms and Pages paths.');
   } finally {if(browser) await browser.close();server.close();}
-})().catch(error=>{console.error(error);process.exitCode=1;});
+}
+if(require.main===module) runSmoke().catch(error=>{console.error(error);process.exitCode=1;});
+module.exports={server,mock};

@@ -62,6 +62,7 @@ def install(destination: Path) -> None:
         'libro/index.html', 'libro/admin/index.html',
         'libro/assets/style.css', 'libro/assets/common.js', 'libro/assets/album.js',
         'libro/assets/admin.js', 'libro/assets/copertina.webp',
+        'libro/assets/book-v2.css', 'libro/assets/photo-style.js', 'libro/assets/photo-studio.js',
         'supabase/001_album_privato.sql',
     ]
     for rel in files:
