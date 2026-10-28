@@ -1,0 +1,131 @@
+/* Lettura immersiva del Libro di Mattia.
+ * fullscreen + orientation lock ove supportati; fallback viewport su iPhone.
+ * Non contiene dati personali o percorsi fotografici. */
+body.immersive-active{overflow:hidden!important;overscroll-behavior:none}
+#memory-section.reader-immersive{
+  position:fixed!important;inset:0!important;z-index:90!important;
+  box-sizing:border-box;width:100vw!important;max-width:none!important;
+  height:100vh!important;height:100dvh!important;
+  margin:0!important;padding:max(7px,env(safe-area-inset-top)) max(9px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(9px,env(safe-area-inset-left))!important;
+  display:flex!important;flex-direction:column!important;gap:4px!important;
+  overflow:hidden!important;overscroll-behavior:contain;
+  background:radial-gradient(circle at 50% -20%,#545347 0%,#2c2b27 65%,#1d1c1a 100%)!important;color:#f7f4ec;
+}
+#memory-section.reader-immersive:fullscreen{width:100%!important;height:100%!important;inset:0!important}
+#memory-section.reader-immersive .chapter-heading{display:none!important}
+#memory-section.reader-immersive .immersive-toolbar{
+  display:flex!important;align-items:center;gap:12px;flex:none;
+  min-height:42px;padding:0 clamp(6px,2vw,20px);color:#faf5ea;
+}
+#memory-section.reader-immersive .immersive-logo{font-size:20px;color:#d9bca3}
+#memory-section.reader-immersive .immersive-name{font:600 clamp(17px,2.6vw,24px) 'Cormorant Garamond',Georgia,serif;white-space:nowrap}
+#memory-section.reader-immersive .immersive-chapter{flex:1;min-width:0;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 12px 'DM Sans',Arial,sans-serif;color:#d9cfbd}
+#memory-section.reader-immersive .immersive-close{
+  flex:none;border:1px solid #908777;border-radius:99px;color:#fffdf8;
+  background:#594f45;padding:8px 13px;min-height:36px;font:600 12px 'DM Sans',Arial,sans-serif;cursor:pointer;
+}
+#memory-section.reader-immersive .immersive-close:focus-visible{outline:3px solid #b8d1b1;outline-offset:2px}
+#memory-section.reader-immersive #memories-list.book-stage{
+  flex:1;min-width:0;min-height:0;max-height:none;box-sizing:border-box;
+  width:100%;max-width:none;margin:0!important;padding:5px!important;
+  display:flex!important;align-items:center;justify-content:center;
+  background:transparent;border:0;box-shadow:none;overflow:hidden;
+}
+#memory-section.reader-immersive #memories-list.book-stage:before{display:none}
+#memory-section.reader-immersive .book-spread{
+  flex:none;max-width:100%;max-height:100%;min-height:0;
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  box-shadow:0 12px 30px rgba(5,5,5,.35);
+  background:#fffaf1;overflow:hidden;
+}
+#memory-section.reader-immersive .book-spine{
+  top:50%;bottom:auto;height:var(--immersive-book-height,240px);
+  transform:translate(-50%,-50%);max-height:100%;width:7px;z-index:6
+}
+#memory-section.reader-immersive .book-leaf{
+  height:100%;min-height:0;max-height:none;
+  padding:clamp(7px,2vh,25px) clamp(6px,2vw,23px);
+}
+#memory-section.reader-immersive .book-leaf--approved{padding:0!important}
+#memory-section.reader-immersive .book-leaf--photo{padding:7px 6px 13px;gap:4px}
+#memory-section.reader-immersive .book-photo{max-height:100%;min-height:0}
+#memory-section.reader-immersive .book-photo-window{aspect-ratio:auto;min-height:0}
+#memory-section.reader-immersive .book-leaf-title{font-size:clamp(17px,5.5vh,34px);line-height:1.08;margin:0 0 9px}
+#memory-section.reader-immersive .book-leaf-body{font-size:clamp(10px,3vh,17px);line-height:1.32}
+#memory-section.reader-immersive .book-kicker{font-size:clamp(7px,1.8vh,10px);margin-bottom:8px}
+#memory-section.reader-immersive .book-leaf-number{font-size:8px;bottom:6px}
+#memory-section.reader-immersive .book-bloom{font-size:clamp(24px,7vh,47px);margin-bottom:12px}
+#memory-section.reader-immersive .book-ornament,
+#memory-section.reader-immersive .book-script{margin-top:10px;font-size:11px}
+#memory-section.reader-immersive .book-end-signet{font-size:28px;margin-bottom:10px}
+#memory-section.reader-immersive .book-photo-caption{font-size:11px;min-height:20px;max-height:48px;overflow:auto}
+#memory-section.reader-immersive .book-photo-caption p{font-size:10px}
+#memory-section.reader-immersive .book-photo-collection{font-size:7px}
+#memory-section.reader-immersive #spread-tip{display:none!important}
+#memory-section.reader-immersive #page-nav{
+  flex:none;width:min(620px,100%);max-width:100%;margin:0 auto!important;
+  display:flex;justify-content:center;align-items:center;gap:14px;
+  min-height:46px;padding:3px 3px 0;box-sizing:border-box;
+}
+#memory-section.reader-immersive #page-nav .outline-btn{
+  min-width:0;min-height:36px;padding:7px 14px;border-color:#777267;
+  color:#f6f2e8;background:#4d493e;font-size:12px;border-radius:99px;
+}
+#memory-section.reader-immersive #page-nav .outline-btn:disabled{opacity:.28}
+#memory-section.reader-immersive #page-count{
+  flex:none;font:500 clamp(11px,2.4vw,14px) 'DM Sans',Arial,sans-serif;
+  white-space:nowrap;color:#f2e9dc
+}
+.immersive-rotate{display:none}
+@media (orientation:portrait){
+ #memory-section.reader-immersive:not(.immersive-portrait-allowed) .immersive-rotate{
+  position:absolute;inset:0;z-index:35;box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:30px max(28px,8vw);text-align:center;
+  background:linear-gradient(160deg,#1e332a,#293c32 65%,#303a2f);color:#fff8ea;
+ }
+}
+.immersive-rotate-symbol{
+ display:block;font:76px/1 Georgia,serif;color:#d6c6a3;transform:rotate(-40deg);
+ margin-bottom:9px;animation:rotate-hint 2.5s ease-in-out infinite alternate
+}
+@keyframes rotate-hint{from{transform:rotate(-45deg)}to{transform:rotate(10deg)}}
+.immersive-rotate h3{font:600 clamp(37px,11vw,56px)/1.05 'Cormorant Garamond',Georgia,serif;margin:10px 0 13px}
+.immersive-rotate p{margin:0 auto 12px;max-width:340px;font:400 15px/1.55 'DM Sans',Arial,sans-serif}
+.immersive-rotate .immersive-rotate-small{font-size:12px;color:#c7d2c7}
+.immersive-rotate-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.immersive-rotate-actions button{
+ border:1px solid #899b8b;background:#f9f1dd;color:#22382a;border-radius:99px;
+ min-height:43px;padding:10px 15px;font:600 12px 'DM Sans',Arial,sans-serif;cursor:pointer
+}
+.immersive-rotate-actions button+button{background:transparent;color:#f9f1dd}
+.immersive-media[hidden]{display:none!important}
+.immersive-media{
+ position:absolute;inset:0;z-index:55;
+ display:flex;flex-direction:column;align-items:center;
+ background:rgba(11,13,12,.98);box-sizing:border-box;
+ padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))
+}
+.immersive-media>.immersive-close{align-self:flex-end;position:relative;z-index:2}
+.immersive-media-content{
+ flex:1;min-width:0;min-height:0;width:100%;display:flex;
+ align-items:center;justify-content:center;overflow:auto;overscroll-behavior:contain
+}
+.immersive-media-content img,.immersive-media-content video{
+ display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain
+}
+.immersive-media-content p{color:#f9f1dd;font-size:14px}
+@media(max-height:500px) and (orientation:landscape){
+ #memory-section.reader-immersive .immersive-toolbar{min-height:32px;gap:8px}
+ #memory-section.reader-immersive .immersive-name{font-size:17px}
+ #memory-section.reader-immersive .immersive-close{min-height:29px;padding:5px 10px}
+ #memory-section.reader-immersive #page-nav{min-height:34px;gap:9px}
+ #memory-section.reader-immersive #page-nav .outline-btn{min-height:30px;padding:5px 10px;font-size:11px}
+}
+@media(max-width:380px){
+ #memory-section.reader-immersive .immersive-name{font-size:16px}
+ #memory-section.reader-immersive .immersive-chapter{display:none}
+ #memory-section.reader-immersive #page-nav{gap:7px}
+ #memory-section.reader-immersive #page-nav .outline-btn{padding:6px 9px;font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.immersive-rotate-symbol{animation:none}}

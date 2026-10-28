@@ -7,6 +7,10 @@
   const state = { chapters:[], memories:[], media:[], notes:[], selected:null, pageIndex:0, turning:false };
   const mobile = matchMedia('(max-width: 760px)');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  function openMedia(item){
+    const reader=window.MattiaReader;
+    return reader?.isActive()?reader.openMedia(item):M.openLightbox([item]);
+  }
   let turnVersion=0;
   let lastApprovedSwipe=0;
   function cancelTurn(){++turnVersion;state.turning=false;}
@@ -75,12 +79,12 @@
       const open=section('button','book-photo-open','Ingrandisci');
       open.type='button';
       open.setAttribute('aria-label',`Apri fotografia ${index+1}: ${memory.title}`);
-      open.addEventListener('click',()=>M.openLightbox([media]));
+      open.addEventListener('click',()=>openMedia(media));
       photo.append(frame,open);
     } else {
       const play=section('button','book-video-open','▶ Guarda il video');
       play.type='button';
-      play.addEventListener('click',()=>M.openLightbox([media]));
+      play.addEventListener('click',()=>openMedia(media));
       frame.appendChild(play);
       photo.appendChild(frame);
     }
@@ -98,7 +102,7 @@
  img.alt=memory.title+' — '+(side==='left'?'pagina sinistra':'pagina destra');
  img.loading='eager';img.decoding='async';
  button.appendChild(img);leaf.appendChild(button);
- button.addEventListener('click',()=>{if(Date.now()-lastApprovedSwipe<550)return;M.openLightbox([media]);});
+ button.addEventListener('click',()=>{if(Date.now()-lastApprovedSwipe<550)return;openMedia(media);});
  M.secureMediaUrl(media.storage_path).then(url=>{if(img.isConnected)img.src=url;})
    .catch(()=>{if(img.isConnected){img.alt='Tavola non disponibile';leaf.classList.add('book-approved-error');}});
 }
