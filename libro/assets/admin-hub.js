@@ -10,14 +10,14 @@
   const entries = [
     {id:'pagine', number:'01', label:'Pagine', title:'Pagine approvate', subtitle:'Le tavole definitive, pronte da caricare e sfogliare.', owner:true,
       elements:[document.getElementById('approved-panel')]},
-    {id:'ricordi', number:'02', label:'Ricordi', title:'Ricordi e fotografie', subtitle:'Scrivi un ricordo, modifica quelli esistenti e aggiungi immagini.', owner:false,
+    {id:'dediche', number:'02', label:'Bacheca privata', title:'Bacheca privata', subtitle:'Messaggi, dediche e fotografie lasciati a Mattia. Li vedete soltanto voi genitori.', owner:true,
+      elements:[document.getElementById('private-board')]},
+    {id:'ricordi', number:'03', label:'Ricordi', title:'Ricordi e fotografie', subtitle:'Scrivi un ricordo, modifica quelli esistenti e aggiungi immagini.', owner:false,
       elements:[document.getElementById('memory-form')?.closest('section'),document.getElementById('admin-memory-list')?.closest('section')]},
-    {id:'foto', number:'03', label:'Studio foto', title:'Studio fotografico', subtitle:'Regola luce, cornici e didascalie delle fotografie non ancora impaginate.', owner:true,
+    {id:'foto', number:'04', label:'Studio foto', title:'Studio fotografico', subtitle:'Regola luce, cornici e didascalie delle fotografie non ancora impaginate.', owner:true,
       elements:[document.getElementById('photo-studio')]},
-    {id:'famiglia', number:'04', label:'Famiglia', title:'Famiglia e capitoli', subtitle:'Gestisci gli inviti e scegli i capitoli da condividere.', owner:true,
-      elements:[owner.querySelector('.two-panel-grid')]},
-    {id:'dediche', number:'05', label:'Dediche', title:'Dediche private', subtitle:'Le parole e le fotografie lasciate per Mattia, visibili soltanto ai genitori.', owner:true,
-      elements:[document.getElementById('private-board')]}
+    {id:'famiglia', number:'05', label:'Famiglia', title:'Famiglia e capitoli', subtitle:'Gestisci gli inviti e scegli i capitoli da condividere.', owner:true,
+      elements:[owner.querySelector('.two-panel-grid')]}
   ];
   if (entries.some(item=>item.elements.some(el=>!el))) {
     console.error('Impossibile costruire il menu Gestisci: manca una sezione.');
