@@ -11,7 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/style.css">
-  <link rel="stylesheet" href="../assets/book-v2.css?v=3-20261027">
+  <link rel="stylesheet" href="../assets/book-v2.css?v=4-20261028">
+  <link rel="stylesheet" href="../assets/admin-hub.css?v=4-20261028">
 </head>
 <body>
   <a class="skip" href="#main">Vai al contenuto</a>
@@ -24,7 +25,7 @@
     <div class="admin-heading">
       <p class="overline">SOLO PER LA FAMIGLIA</p>
       <h1>La stanza dei <em>ricordi.</em></h1>
-      <p class="section-lead">Qui potete scrivere nuove pagine, aggiungere foto e scegliere chi potrà leggere il vostro libro.</p>
+      <p class="section-lead">Tutte le funzioni del libro, ordinate per attività. Le tavole approvate sono sempre a portata di mano.</p>
     </div>
 
     <section id="gate" class="gate-section" aria-labelledby="gate-title">
@@ -95,7 +96,7 @@
                 <input id="approved-files" type="file" accept="image/png,.png" multiple required>
               </label>
             </div>
-            <p class="tiny-note">Le tavole vengono ordinate da 1 in poi; su PC vedrai la doppia pagina, mentre su smartphone sfoglierai la metà sinistra e poi la destra. I file originali rimangono invariati e privati.</p>
+            <p class="tiny-note">Le tavole vengono ordinate da 1 in poi; sia su PC sia su smartphone vedrai le due pagine insieme, e potrai ingrandire i dettagli con un tocco. I file originali rimangono invariati e privati.</p>
             <div id="approved-draft" class="approved-draft" aria-live="polite"></div>
             <div id="approved-existing" class="approved-existing"></div>
             <p id="approved-status" class="status" role="status" aria-live="polite"></p>
@@ -146,5 +147,6 @@
   <script src="../assets/admin.js?v=2-20261027"></script>
   <script src="../assets/photo-studio.js?v=3-20261027"></script>
   <script src="../assets/approved-pages.js?v=3-20261027"></script>
+  <script src="../assets/admin-hub.js?v=4-20261028"></script>
 </body>
 </html>
