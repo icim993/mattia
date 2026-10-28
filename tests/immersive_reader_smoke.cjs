@@ -10,7 +10,7 @@ const {server,mock}=require('./pages_smoke.cjs');
    const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,reducedMotion:'reduce'});
    await context.route('https://**/*',r=>r.fulfill({status:200,contentType:'text/javascript',body:''}));
    await context.route('**/libro/assets/config.js',r=>r.fulfill({status:200,contentType:'text/javascript',body:''}));
-   const fakeNative=kind==='native'?\`
+   const fakeNative=kind==='native'?`
      window.testOrientation={requests:0,locks:[],unlocks:0};
      Object.defineProperty(document,'fullscreenEnabled',{configurable:true,value:true});
      Object.defineProperty(document,'fullscreenElement',{configurable:true,get(){return window.testFullscreenElement||null;}});
@@ -27,8 +27,8 @@ const {server,mock}=require('./pages_smoke.cjs');
        Object.defineProperty(screen.orientation,'lock',{configurable:true,value:async (kind)=>{window.testOrientation.locks.push(kind);}});
        Object.defineProperty(screen.orientation,'unlock',{configurable:true,value:()=>{window.testOrientation.unlocks++;}});
      }
-   \`: \`Object.defineProperty(document,'fullscreenEnabled',{configurable:true,value:false});\`;
-   const setup=\`(${mock.toString()})({role:'viewer',signedIn:true,v2:true});
+   `: `Object.defineProperty(document,'fullscreenEnabled',{configurable:true,value:false});`;
+   const setup=`(${mock.toString()})({role:'viewer',signedIn:true,v2:true});
      window.MATTIA_CONFIG={url:'https://example.supabase.co',anonKey:'test'};
      window.testRows.album_memories=[
        {id:'a1',chapter_id:1,title:'Il primo segno',page_order:1,memory_date:'2026-03-09'},
@@ -38,7 +38,7 @@ const {server,mock}=require('./pages_smoke.cjs');
        id:'photo'+m.id,memory_id:m.id,storage_path:'u1/'+m.id+'/page.png',
        media_kind:'image',sort_order:0,photo_settings:{approved_spread:true,spread_width:1448,spread_height:1086}
      }));
-     ${fakeNative}\`;
+     ${fakeNative}`;
    await context.addInitScript({content:setup});
    const page=await context.newPage(),errors=[];
    page.on('pageerror',e=>errors.push(e.message));
