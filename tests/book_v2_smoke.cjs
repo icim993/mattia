@@ -25,10 +25,17 @@ async function next(page){const old=await page.locator('#page-count').innerText(
     for(const width of [1366,768,390,320]){
       const {page,context,errors}=await open('libro/',width,'viewer');
       await page.locator('.chapter-card').first().click();
-      assert.equal(await page.locator('.book-leaf').count(),width>760?2:1);
-      if(width<=760)await next(page); // story
+      assert.equal(await page.locator('.book-leaf').count(),2);
       assert.match(await page.locator('.book-leaf').allInnerTexts().then(x=>x.join(' ')),/Ricordo di prova/);
-      await next(page); // photograph
+      if(width<=760){
+        assert.equal(await page.locator('.book-spread').evaluate(el=>getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length),2);
+        const before=await page.locator('#page-count').innerText();
+        await page.locator('#memories-list').evaluate(el=>{
+          el.dispatchEvent(new TouchEvent('touchstart',{touches:[new Touch({identifier:1,target:el,clientX:250,clientY:200})]}));
+          el.dispatchEvent(new TouchEvent('touchend',{changedTouches:[new Touch({identifier:1,target:el,clientX:100,clientY:208})]}));
+        });
+        await page.waitForFunction(old=>document.querySelector('#page-count').textContent!==old,before);
+      }else await next(page); // photographs
       await page.locator('.book-photo-image').first().waitFor();
       await page.waitForFunction(()=>document.querySelector('.book-photo-image')?.naturalWidth>0);
       assert.equal(await page.locator('.book-photo-image').first().evaluate(img=>img.style.objectFit),'contain');
@@ -37,13 +44,14 @@ async function next(page){const old=await page.locator('#page-count').innerText(
       await noOverflow(page);
       await page.screenshot({path:path.join(preview,`book-${width}.png`),fullPage:true});
       if(width<=760){
+        assert.equal(await page.locator('.book-photo-image').count(),2);
         const count=await page.locator('#page-count').innerText();
         await page.locator('#memories-list').evaluate(el=>{
-          el.dispatchEvent(new TouchEvent('touchstart',{touches:[new Touch({identifier:1,target:el,clientX:250,clientY:200})]}));
-          el.dispatchEvent(new TouchEvent('touchend',{changedTouches:[new Touch({identifier:1,target:el,clientX:100,clientY:208})]}));
+          el.dispatchEvent(new TouchEvent('touchstart',{touches:[new Touch({identifier:1,target:el,clientX:100,clientY:200})]}));
+          el.dispatchEvent(new TouchEvent('touchend',{changedTouches:[new Touch({identifier:1,target:el,clientX:250,clientY:208})]}));
         });
         await page.waitForFunction(old=>document.querySelector('#page-count').textContent!==old,count);
-        assert.match(await page.locator('.book-photo-caption').innerText(),/Seconda foto/);
+        assert.match(await page.locator('.book-leaf').allInnerTexts().then(x=>x.join(' ')),/Ricordo di prova/);
       }
       await page.locator('#back-chapters').click();assert.equal(await page.locator('#memory-section').isVisible(),false);
       assert.equal((await page.evaluate(()=>window.testCalls)).includes('guestbook_private'),false);
@@ -51,6 +59,7 @@ async function next(page){const old=await page.locator('#page-count').innerText(
     }
     for(const width of [1366,390]){
       const {page,context,errors}=await open('libro/admin/',width);
+      await page.locator('#admin-tab-foto').click();
       await page.waitForFunction(()=>document.querySelector('#studio-frame img')?.naturalWidth>0);
       await page.locator('#studio-caption').fill('Didascalia <b>sicura</b>');
       await page.locator('#studio-layout').selectOption('gallery');
@@ -104,6 +113,7 @@ async function next(page){const old=await page.locator('#page-count').innerText(
     // In-flight studio/media requests must never restore private UI after logout.
     {
       const {page,context,errors}=await open('libro/admin/',1366);
+      await page.locator('#admin-tab-foto').click();
       await page.locator('#studio-memory option').first().waitFor({state:'attached'});
       await page.evaluate(()=>{window.testQueryDelay=180;window.testDownloadDelay=180});
       await page.locator('#studio-reload').click();await page.locator('#logout-button').click();
@@ -137,7 +147,8 @@ async function next(page){const old=await page.locator('#page-count').innerText(
       assert.match(await page.locator('.book-spread').innerText(),/Benvenuto al mondo/);
       assert.equal(await page.locator('#page-count').innerText(),'Pagine 1–2 di 2');
       await page.setViewportSize({width:390,height:844});
-      await page.waitForFunction(()=>document.querySelectorAll('.book-leaf').length===1);
+      await page.waitForFunction(()=>document.querySelectorAll('.book-leaf').length===2);
+      assert.equal(await page.locator('.book-spread').evaluate(el=>getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length),2);
       assert.deepEqual(errors,[]);await context.close();console.log('PASS V2 animation cancellation, chapter switch, responsive resize');
     }
     console.log('PASS V2 suite: 12 behavioral scenarios. Fixtures only; authenticated RLS is a separate live test.');

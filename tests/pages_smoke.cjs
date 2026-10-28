@@ -166,19 +166,19 @@ async function runSmoke(){
           await page.locator('.chapter-card').first().waitFor();
           assert.equal(await page.locator('#admin-link').isVisible(),scenario.role==='owner');
           await page.locator('.chapter-card').first().click();
-          if(width<=760)await page.locator('#next-page').click();
           assert.match(await page.locator('#memories-list').innerText(),/Ricordo di prova/);
           if (scenario.role==='owner') {
             await page.locator('#admin-link').click();
             assert.equal(page.url(),base+'libro/admin/');
-            await page.locator('.manage-item').first().waitFor();
+            await page.locator('.manage-item').first().waitFor({state:'attached'});
             assert.equal(await page.evaluate(()=>window.Mattia.bookBase.href),base+'libro/');
           }
         } else {
-          await page.locator('.manage-item').first().waitFor();
+          await page.locator('.manage-item').first().waitFor({state:'attached'});
           assert.equal(await page.locator('#owner-only').isVisible(),scenario.role==='owner');
           assert.equal((await page.evaluate(()=>window.testCalls)).includes('album_access'),scenario.role==='owner');
           if (scenario.role==='owner') {
+            await page.locator('#admin-tab-dediche').click();
             if (scenario.boardError) await page.waitForFunction(()=>document.querySelector('#private-board-status').classList.contains('error'));
             else {
               await page.locator('#private-board-list img').waitFor();
@@ -189,12 +189,14 @@ async function runSmoke(){
             }
             assert.equal(await page.locator('#private-board').isVisible(),true);
           } else assert.equal(await page.locator('#private-board').isVisible(),false);
+          if (scenario.role==='owner') await page.locator('#admin-tab-ricordi').click();
           await page.locator('#memory-title').fill('Nuovo ricordo');
           await page.locator('#memory-body').fill('Test album');
           await page.locator('#memory-submit').click();
           await page.waitForFunction(()=>document.querySelector('#memory-status').textContent.includes('Ricordo salvato'));
           assert.equal((await page.evaluate(()=>window.testWrites)).some(x=>x.table==='album_memories'),true);
           if (scenario.role==='owner') {
+            await page.locator('#admin-tab-famiglia').click();
             assert.equal(await page.locator('#copy-whatsapp-invite').isDisabled(),true);
             for (const inviteRole of ['viewer','contributor']) {
               await page.locator('#invite-email').fill('nonna@example.test');

@@ -34,32 +34,30 @@
   }
   try {
     browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{})});
-    for(const width of [1366,390]) {
+    for(const width of [1366,390,320]) {
       const {page,context,errors}=await open('libro/',width,'viewer',true);
       await page.locator('.chapter-card').first().click();
       await page.locator('.book-approved-image').first().waitFor();
       await page.waitForFunction(()=>document.querySelector('.book-approved-image')?.naturalWidth>0);
-      assert.equal(await page.locator('.book-leaf--approved').count(),width>760?2:1);
+      assert.equal(await page.locator('.book-leaf--approved').count(),2);
       assert.match(await page.locator('#page-count').innerText(),/Tavola 1 di 3/);
       const actualAspect=await page.locator('.book-spread').evaluate(e=>{const r=e.getBoundingClientRect();return r.width/r.height;});
-      assert.ok(Math.abs(actualAspect-(width>760?1408/1024:704/1024))<0.09,`aspect ${actualAspect}`);
+      assert.ok(Math.abs(actualAspect-1408/1024)<0.09,`aspect ${actualAspect}`);
       const firstHalf=await page.locator('.book-approved-image').first().evaluate(img=>img.getBoundingClientRect().width/img.parentElement.getBoundingClientRect().width);
       assert.ok(firstHalf>1.9&&firstHalf<2.1);
       await page.locator('#next-page').click();
-      if(width>760){
-        await page.waitForFunction(()=>document.querySelector('#page-count')?.textContent==='Tavola 2 di 3');
-      }else{
-        await page.waitForFunction(()=>document.querySelector('#page-count')?.textContent.includes('lato destro'));
-        assert.equal(await page.locator('.book-leaf--approved-right').count(),1);
-        const left=await page.locator('.book-approved-image').first().evaluate(img=>img.getBoundingClientRect().left);
-        const containerLeft=await page.locator('.book-approved-action').first().evaluate(el=>el.getBoundingClientRect().left);
-        assert.ok(left<containerLeft-20,'right image half should be shifted left');
-      }
+      await page.waitForFunction(()=>document.querySelector('#page-count')?.textContent==='Tavola 2 di 3');
+      assert.equal(await page.locator('.book-leaf--approved-left').count(),1);
+      assert.equal(await page.locator('.book-leaf--approved-right').count(),1);
+      const rightOffset=await page.locator('.book-leaf--approved-right .book-approved-image').evaluate(img=>img.getBoundingClientRect().left-img.parentElement.getBoundingClientRect().left);
+      assert.ok(rightOffset < -20,'second leaf must display the right half');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
       assert.deepEqual(errors,[]);await context.close();
       console.log('PASS approved book '+width+'px');
     }
     const {page,context,errors}=await open('libro/admin/',390,'owner',false);
     await page.locator('#approved-panel').waitFor({state:'visible'});
+    assert.equal(await page.locator('#admin-tab-pagine').getAttribute('aria-pressed'),'true');
     await page.locator('#approved-chapter option').first().waitFor({state:'attached'});
     assert.equal(await page.locator('#approved-chapter').inputValue(),'1');
     const uploads=['01_Il_primo_segno.png','02_La_scelta_del_nome.png','03_La_prima_volta_che_ti_abbiamo_visto.png'].map(name=>({name,mimeType:'image/png',buffer:png}));

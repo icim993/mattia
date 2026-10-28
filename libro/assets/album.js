@@ -8,6 +8,7 @@
   const mobile = matchMedia('(max-width: 760px)');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let turnVersion=0;
+  let lastApprovedSwipe=0;
   function cancelTurn(){++turnVersion;state.turning=false;}
   const PERMITTED_LAYOUTS = new Set(['full','polaroid','paper','film','gallery','letter']);
 
@@ -97,7 +98,7 @@
  img.alt=memory.title+' — '+(side==='left'?'pagina sinistra':'pagina destra');
  img.loading='eager';img.decoding='async';
  button.appendChild(img);leaf.appendChild(button);
- button.addEventListener('click',()=>M.openLightbox([media]));
+ button.addEventListener('click',()=>{if(Date.now()-lastApprovedSwipe<550)return;M.openLightbox([media]);});
  M.secureMediaUrl(media.storage_path).then(url=>{if(img.isConnected)img.src=url;})
    .catch(()=>{if(img.isConnected){img.alt='Tavola non disponibile';leaf.classList.add('book-approved-error');}});
 }
@@ -166,7 +167,7 @@
   function renderCurrent(){
     const pages=chapterPages(state.selected);
     if(!pages.length)return;
-    const per=mobile.matches?1:2;
+    const per=2;
     state.pageIndex=Math.min(Math.floor(state.pageIndex/per)*per,Math.max(0,Math.floor((pages.length-1)/per)*per));
     buildBook(pages,per);
     const shown=pages.slice(state.pageIndex,state.pageIndex+per);
@@ -181,12 +182,21 @@
         `Pagina ${state.pageIndex+1} di ${pages.length}`;
     }
     $('page-nav').hidden=false;
+    const hint=$('spread-tip');
+    if(hint){
+      hint.hidden=!mobile.matches;
+      if(mobile.matches){
+        hint.textContent=shown.some(p=>p.type==='approved')?
+          'Le due pagine sono insieme. Tocca una tavola per ingrandirla.':
+          'Il libro è aperto su due pagine: scorri per continuare.';
+      }
+    }
     $('prev-page').disabled=state.pageIndex===0;
     $('next-page').disabled=state.pageIndex+per>=pages.length;
   }
   async function turn(direction){
     if(state.selected===null || state.turning)return;
-    const pages=chapterPages(state.selected),per=mobile.matches?1:2;
+    const pages=chapterPages(state.selected),per=2;
     const next=state.pageIndex+direction*per;
     if(next<0 || next>=pages.length)return;
     state.turning=true;
@@ -255,7 +265,11 @@
   $('memories-list').addEventListener('touchend',e=>{
     if(!touch||!e.changedTouches.length)return;
     const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;touch=null;
-    if(!e.target.closest('button,video') && Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.5)turn(dx<0?1:-1);
+    const approvedButton=e.target.closest('.book-approved-action');
+    if((approvedButton || !e.target.closest('button,video')) && Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.5){
+      if(approvedButton)lastApprovedSwipe=Date.now();
+      turn(dx<0?1:-1);
+    }
   },{passive:true});
   document.addEventListener('keydown',e=>{
     if($('memory-section').hidden || !$('lightbox').hidden || ['INPUT','TEXTAREA','SELECT','VIDEO'].includes(document.activeElement?.tagName))return;
@@ -267,12 +281,12 @@
   else mobile.addListener(mediaResize);
   $('back-chapters').addEventListener('click',()=>{
     cancelTurn();
-    $('memory-section').hidden=true;state.selected=null;
+    $('memory-section').hidden=true;state.selected=null;if($('spread-tip'))$('spread-tip').hidden=true;
     $('chapters').scrollIntoView({behavior:reduced.matches?'auto':'smooth'});
   });
   $('open-book').addEventListener('click',e=>{if($('private-content').hidden){e.preventDefault();$('gate').scrollIntoView({behavior:'smooth'});}});
   M.start({
-    onAccessCleared:()=>{cancelTurn();state.chapters=[];state.memories=[];state.media=[];state.notes=[];state.selected=null;M.empty($('memories-list'));M.empty($('chapter-grid'));$('memory-section').hidden=true;},
+    onAccessCleared:()=>{cancelTurn();state.chapters=[];state.memories=[];state.media=[];state.notes=[];state.selected=null;M.empty($('memories-list'));M.empty($('chapter-grid'));$('memory-section').hidden=true;if($('spread-tip'))$('spread-tip').hidden=true;},
     onAuthorized:async()=>{try{await loadBook();}catch(error){console.error('Caricamento libro',error);M.empty($('chapter-grid'));$('chapter-grid').appendChild(section('p','empty-state','Non è stato possibile caricare il libro. Riprova.'));}}
   });
 })();
