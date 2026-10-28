@@ -66,8 +66,17 @@ const {server,mock}=require('./pages_smoke.cjs');
    await page.locator('#immersive-media-close').click();
    assert.equal(await page.locator('#immersive-media').isVisible(),false);
    await page.setViewportSize({width:844,height:390});
-   await page.waitForFunction(()=>{const el=document.querySelector('.book-spread');return el&&el.style.width&&el.style.height;});
-   const bounds=await page.locator('.book-spread').boundingBox();
+   // The responsive renderer replaces the spread on breakpoint changes.
+   // Wait for the *new visible spread*, not stale inline styles during replacement.
+   await page.waitForFunction(()=>{
+     const spread=document.querySelector('#memory-section.reader-immersive .book-spread');
+     if(!spread)return false;
+     const box=spread.getBoundingClientRect();
+     return box.width>180&&box.height>140&&box.width<innerWidth&&box.height<innerHeight;
+   },null,{timeout:15000});
+   const bounds=await page.locator('#memory-section.reader-immersive .book-spread').evaluate(el=>{
+     const rect=el.getBoundingClientRect();return {width:rect.width,height:rect.height};
+   });
    assert.ok(bounds.width>180&&bounds.height>140);
    assert.ok(bounds.width<844&&bounds.height<390);
    assert.ok(Math.abs(bounds.width/bounds.height-1448/1086)<.06,'preserve original two-page aspect');
