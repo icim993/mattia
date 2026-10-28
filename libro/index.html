@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#f7f2e9">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="book-base" content="./">
@@ -13,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/book-v2.css?v=4-20261028">
+  <link rel="stylesheet" href="assets/immersive-reader.css?v=5-20261028">
 </head>
 <body>
   <a class="skip" href="#main">Vai al contenuto</a>
@@ -98,6 +101,12 @@
       </section>
 
       <section id="memory-section" class="memories-section" aria-labelledby="selected-title" hidden>
+        <div id="immersive-toolbar" class="immersive-toolbar" hidden>
+          <span class="immersive-logo" aria-hidden="true">♡</span>
+          <span class="immersive-name">Il libro di Mattia</span>
+          <span id="immersive-chapter" class="immersive-chapter"></span>
+          <button type="button" id="immersive-close" class="immersive-close" aria-label="Esci dalla lettura a tutto schermo">✕ <span>Esci</span></button>
+        </div>
         <div class="chapter-heading">
           <div><p class="overline" id="selected-number">CAPITOLO</p><h2 id="selected-title"></h2><p id="selected-intro" class="section-lead"></p></div>
           <button type="button" id="back-chapters" class="text-btn">← Tutti i capitoli</button>
@@ -109,6 +118,20 @@
           <span id="page-count" class="page-count">Pagina 1 di 1</span>
           <button type="button" id="next-page" class="outline-btn">Successiva →</button>
         </nav>
+        <div id="immersive-rotate" class="immersive-rotate" aria-label="Ruota il telefono per leggere il libro">
+          <span class="immersive-rotate-symbol" aria-hidden="true">↻</span>
+          <h3>Ruota il telefono</h3>
+          <p>Per sfogliare il libro aperto e vedere entrambe le pagine, gira lo smartphone in orizzontale.</p>
+          <p class="immersive-rotate-small">Se lo schermo non gira, disattiva il blocco rotazione del telefono.</p>
+          <div class="immersive-rotate-actions">
+            <button type="button" id="immersive-read-portrait">Leggi comunque</button>
+            <button type="button" id="immersive-rotate-exit">Esci dal libro</button>
+          </div>
+        </div>
+        <div id="immersive-media" class="immersive-media" hidden role="dialog" aria-modal="true" aria-label="Fotografia ingrandita">
+          <button type="button" id="immersive-media-close" class="immersive-close" aria-label="Chiudi fotografia ingrandita">✕ <span>Chiudi</span></button>
+          <div id="immersive-media-content" class="immersive-media-content"></div>
+        </div>
       </section>
     </div>
   </main>
@@ -124,6 +147,7 @@
   <script src="assets/config.js"></script>
   <script src="assets/common.js?v=2-20261027"></script>
   <script src="assets/photo-style.js?v=2-20261027"></script>
-  <script src="assets/album.js?v=4-20261028"></script>
+  <script src="assets/album.js?v=5-20261028"></script>
+  <script src="assets/immersive-reader.js?v=5-20261028"></script>
 </body>
 </html>
