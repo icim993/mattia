@@ -166,7 +166,6 @@ async function runSmoke(){
           await page.locator('.chapter-card').first().waitFor();
           assert.equal(await page.locator('#admin-link').isVisible(),scenario.role==='owner');
           await page.locator('.chapter-card').first().click();
-          if(width<=760)await page.locator('#next-page').click();
           assert.match(await page.locator('#memories-list').innerText(),/Ricordo di prova/);
           if (scenario.role==='owner') {
             await page.locator('#admin-link').click();
