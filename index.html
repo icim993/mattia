@@ -13,25 +13,28 @@
 <style>
 /* Layout: una colonna stretta come un biglietto; il cartellino della culla è l'elemento firma, vuoto prima della nascita e compilato dopo. */
 :root{
-  --paper:#F5F8FC; --card:#FFFFFF; --ink:#1A2947; --muted:#5A6A86;
-  --sky:#8DB6E2; --sky-soft:#E2EDF9; --sun:#E9A62A; --line:#D2DCEA;
-  --good:#2F7D5B; --bad:#C0392B;
+  --paper:#FFF9F1; --card:#FFFFFF; --ink:#243E56; --muted:#5B7186;
+  --sky:#80C4EF; --sky-soft:#E8F6FF; --sun:#F5B83F; --line:#DBE9F0;
+  --peach:#FFE3D1; --mint:#E0F6E8; --lilac:#F1EBFF;
+  --good:#2B8062; --bad:#B33F48;
   --f-display:"Caprasimo", "Cooper Black", Georgia, serif;
   --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono:"DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
   color-scheme:light;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){:root{
-  --paper:#0E1525; --card:#152036; --ink:#E7EEF9; --muted:#9BABC6;
-  --sky:#7AA6D8; --sky-soft:#1B2945; --sun:#F2BC52; --line:#2A3A58; --good:#6CC79C; --bad:#FF8A7A; color-scheme:dark}}
+/* La pagina resta chiara e luminosa anche quando il telefono usa il tema scuro. */
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 img{max-width:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
-.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+body{margin:0;background:
+  radial-gradient(circle at 90% 3%,rgba(255,224,168,.52),transparent 27%),
+  radial-gradient(circle at 4% 33%,rgba(191,231,255,.43),transparent 38%),
+  linear-gradient(180deg,#FFFDFA 0%,var(--paper) 55%,#F8FBFF 100%);
+  color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 56px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
 h1,h2{font-family:var(--f-display);font-weight:400;line-height:1.08;text-wrap:balance;margin:0}
 h1{font-size:clamp(2.4rem,9vw,3.5rem)}
 h2{font-size:clamp(1.6rem,5.5vw,2rem)}
@@ -41,11 +44,20 @@ p{margin:0}
 section{display:flex;flex-direction:column;gap:16px}
 
 /* Hero */
-.hero{display:flex;flex-direction:column;gap:20px}
-.hero .names{font-size:1.05rem;color:var(--muted)}
+.hero{position:relative;display:flex;flex-direction:column;gap:18px;
+  padding:26px 24px 28px;border:1.5px solid #DCECF4;border-radius:28px;
+  background:linear-gradient(145deg,#EAF7FF 0%,#FFFDFC 52%,#FFF3E5 100%);
+  box-shadow:0 18px 45px -35px rgba(40,78,109,.35)}
+.hero .names{font-size:1.08rem;color:#4B6680}
 .hero .arrival-message{font-size:.96rem;color:var(--muted);max-width:55ch}
-body.is-born .hero h1{color:var(--ink)}
-body.is-born .hero .eyebrow{color:var(--good)}
+.hero h1{color:#285C7F}
+body.is-born .hero .eyebrow{color:#287E65;font-weight:600}
+.jump-to-board{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;
+  gap:9px;border-radius:999px;padding:12px 18px;background:#FFE0A3;color:#513E28;
+  text-decoration:none;font-weight:700;line-height:1.3;box-shadow:0 5px 15px -11px #8A5B25}
+.jump-to-board:hover{background:#FFD28A}
+.jump-to-board:focus-visible{outline:3px solid #3184BA;outline-offset:3px}
+
 
 /* Stato in diretta */
 .live{display:flex;flex-direction:column;gap:4px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;max-width:520px}
@@ -55,12 +67,12 @@ body.is-born .hero .eyebrow{color:var(--good)}
 .live .txt{font-weight:700;font-size:1.08rem}
 
 /* Cartellino della culla */
-.tag{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:18px;
-  padding:26px 22px 22px 58px;transform:rotate(-1.2deg);box-shadow:0 10px 30px -18px rgba(26,41,71,.45);max-width:520px}
+.tag{position:relative;background:linear-gradient(155deg,#FFF 15%,#F6FBFF 100%);border:1.5px solid #CFE7F6;border-radius:20px;
+  padding:25px 22px 23px 52px;transform:rotate(-.65deg);box-shadow:0 13px 35px -24px rgba(26,82,127,.33);max-width:540px}
 .tag::before{content:"";position:absolute;left:20px;top:24px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:1.5px solid var(--line)}
 .tag::after{content:"";position:absolute;left:28px;top:-26px;width:2px;height:52px;background:var(--sky);border-radius:2px;transform:rotate(14deg)}
 .tag-title{font-family:var(--f-display);font-size:1.7rem;line-height:1;margin-bottom:14px}
-.tag-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px 18px}
+.tag-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
 .field{display:flex;flex-direction:column;gap:2px;min-width:0}
 .field .k{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .field .v{font-family:var(--f-mono);font-size:1.15rem;font-weight:500;border-bottom:1.5px dashed var(--line);padding-bottom:3px;min-height:1.9rem;font-variant-numeric:tabular-nums}
@@ -70,19 +82,21 @@ body.is-born .hero .eyebrow{color:var(--good)}
 .tag-photo img{display:block;width:100%;height:auto}
 
 /* Form */
-.panel{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.panel{background:linear-gradient(175deg,#FFF 65%,#FFFCF7);border:1.5px solid #E0EAF0;border-radius:19px;padding:20px;display:flex;flex-direction:column;gap:16px}
 .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:440px){.row{grid-template-columns:1fr}}
 label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.92rem;min-width:0}
 label small{font-weight:400;color:var(--muted)}
-input,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-width:0}
+input,textarea{font:inherit;color:var(--ink);background:#FFF; border:1.5px solid #D8E6EE;border-radius:12px;padding:12px 13px;width:100%;min-width:0}
 input[type=date],input[type=time],input[type=number]{font-family:var(--f-mono)}
 input[type=file]{padding:9px;font-size:.9rem}
 textarea{min-height:120px;resize:vertical}
 input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .err{color:var(--bad);font-size:.88rem;min-height:1.2em}
 .ok{color:var(--good);font-weight:700}
-.btn{font:inherit;font-weight:700;border:0;border-radius:999px;padding:13px 22px;cursor:pointer;background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn{font:inherit;font-weight:700;border:0;border-radius:999px;padding:13px 22px;cursor:pointer;background:var(--ink);color:#FFF;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+#msg-btn{background:#F5BA49;color:#3A3026;box-shadow:0 8px 22px -15px rgba(162,103,25,.65)}
+#msg-btn:hover{background:#EFAF33}
 .btn[disabled]{opacity:.55;cursor:progress}
 .btns{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
 .hint{font-size:.88rem;color:var(--muted)}
@@ -104,7 +118,7 @@ legend{font-weight:600;font-size:.92rem;padding:0;margin-bottom:8px}
 .rules{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 @media (max-width:600px){.rules{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:400px){.rules{grid-template-columns:1fr}}
-.rule{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.rule{border:1.5px solid var(--line);border-radius:12px;padding:12px;background:#FFF;display:flex;flex-direction:column;gap:4px}
 .rule .pts{font-family:var(--f-display);font-size:1.6rem;color:var(--sun);line-height:1}
 .rule .pts span{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
 .rule p{font-size:.88rem;color:var(--muted)}
@@ -116,12 +130,23 @@ th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);whit
 tr:last-child td{border-bottom:0}
 th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
 td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-tr.first td{background:var(--sky-soft)}
+tr.first td{background:#FFF1D7}
 tr.fresh td{background:color-mix(in srgb,var(--sun) 18%,transparent)}
 .medal{font-family:var(--f-display);color:var(--sun)}
 .empty{border:1.5px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);text-align:center}
 
-/* Guestbook */
+/* Bacheca degli auguri: prima dei risultati del Toto-Mattia */
+#messaggi{scroll-margin-top:20px;position:relative;padding:24px;border:1.5px solid #E2E3F0;
+  border-radius:26px;background:linear-gradient(150deg,#FFF8F2 0%,#FFF 36%,#F4F9FF 100%);
+  box-shadow:0 18px 48px -38px rgba(74,85,135,.28)}
+#messaggi:target{border-color:#8DC9EB;box-shadow:0 0 0 3px rgba(147,212,249,.21)}
+#messaggi .eyebrow{color:#A36835;font-weight:600}
+#messaggi h2{color:#285C7F}
+.visit-banner{display:flex;gap:12px;align-items:center;border:1px solid #F3DBC1;
+  border-radius:15px;padding:12px 14px;background:#FFF1DD;color:#654C35;font-size:.93rem}
+.visit-banner span:first-child{font-size:1.5rem;flex:0 0 auto}
+.privacy-note{font-size:.85rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px}
+.board-link-note{font-size:.79rem;color:var(--muted)}
 .notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
 @media (max-width:520px){.notes{grid-template-columns:1fr}}
 .note{background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
@@ -143,15 +168,30 @@ tr.fresh td{background:color-mix(in srgb,var(--sun) 18%,transparent)}
 .songs a{font-weight:700;color:var(--ink);font-size:.88rem;white-space:nowrap}
 
 /* Il giorno in cui sei nato */
-.day{background:var(--ink);color:var(--paper);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
-.day h2{color:var(--paper)}
-.day .eyebrow{color:var(--sky)}
+/* Un ricordo luminoso, non un blocco scuro */
+.day{background:linear-gradient(145deg,#E9F6FF,#E9F7EC 92%);border:1.5px solid #CDEBEB;
+  color:var(--ink);border-radius:22px;padding:25px 22px;display:flex;flex-direction:column;gap:18px}
+.day h2{color:#245D76}
+.day .eyebrow{color:#357963}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px}
 @media (max-width:440px){.facts{grid-template-columns:1fr}}
-.fact{display:flex;flex-direction:column;gap:3px;min-width:0;border-top:1px solid color-mix(in srgb,var(--paper) 25%,transparent);padding-top:10px}
-.fact .k{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sky)}
+.fact{display:flex;flex-direction:column;gap:3px;min-width:0;border-top:1px solid #C0DFE2;padding-top:10px}
+.fact .k{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#427689}
 .fact .v{font-weight:600}
-.fact .n{font-size:.88rem;opacity:.8}
+.fact .n{font-size:.88rem;color:#53778B}
+
+@media (max-width:520px){
+ body{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));padding-block:12px 48px}
+ .wrap{gap:25px}
+ .hero{padding:22px 16px 24px;border-radius:23px;gap:17px}
+ #messaggi{padding:20px 15px;border-radius:22px}
+ .tag{padding:22px 14px 19px 45px}
+ .tag-title{font-size:1.65rem}
+ .tag-grid{gap:12px}
+ .field .v{font-size:1.01rem}
+ .panel{padding:16px}
+ .jump-to-board{align-self:stretch;text-align:center}
+}
 
 .banner{border:1.5px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px 14px;font-size:.92rem}
 footer{color:var(--muted);font-size:.85rem;text-align:center}
@@ -192,8 +232,29 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
       <p class="tag-awaiting" id="tag-awaiting">Gli altri dettagli del suo arrivo saranno aggiunti presto. ♡</p>
       <div class="tag-photo" id="t-foto" hidden><img alt="Mattia appena nato" id="t-foto-img"></div>
     </div>
+    <a class="jump-to-board" href="#messaggi">💌 Lascia un messaggio per Mattia</a>
     <p class="banner" id="load-err" hidden>Non riesco a caricare scommesse e messaggi in questo momento. Ricarica la pagina tra poco.</p>
   </header>
+
+  <!-- Bacheca: accessibile direttamente con #messaggi, anche da un QR code -->
+  <section id="messaggi" aria-labelledby="bacheca-title">
+    <p class="eyebrow">La bacheca degli auguri · per Mattia ♡</p>
+    <h2 id="bacheca-title">Lasciami un pensiero</h2>
+    <p class="lead">Una dedica, un augurio, un ricordo della prima volta che ci siamo incontrati. Un giorno li leggerò tutti.</p>
+    <div class="visit-banner"><span aria-hidden="true">💌</span><span><strong>Sei venuto a conoscere Mattia?</strong> Scrivigli un messaggio da conservare per quando sarà grande.</span></div>
+    <form class="panel" id="msg-form" novalidate>
+      <label for="msg-name">Il tuo nome<input id="msg-name" autocomplete="name" maxlength="40"></label>
+      <label for="msg-text">Il messaggio<textarea id="msg-text" maxlength="1200" placeholder="Caro Mattia, oggi sono venuto a conoscerti e…"></textarea></label>
+      <label for="msg-song">Una canzone per la sua playlist <small>facoltativa: titolo e artista</small><input id="msg-song" maxlength="120"></label>
+      <label for="msg-photo">Una foto <small>facoltativa</small><input id="msg-photo" type="file" accept="image/*"></label>
+      <div class="preview" id="msg-prev" hidden><img id="msg-prev-img" alt="Anteprima della foto"><button class="linkbtn" type="button" id="msg-prev-del">Togli la foto</button></div>
+      <p class="privacy-note"><span aria-hidden="true">🔒</span><span>Le dediche e le foto sono riservate a mamma Angela e papà Marco. Solo nome e canzone scelta possono apparire nella playlist pubblica.</span></p>
+      <p class="err" id="msg-err" role="alert"></p>
+      <div class="btns"><button class="btn" type="submit" id="msg-btn">Lascia il messaggio</button><span class="ok" id="msg-ok" role="status"></span></div>
+    </form>
+    <div id="notes" hidden aria-hidden="true"></div>
+  </section>
+
 
   <!-- PRIMA DELLA NASCITA: il toto -->
   <section id="toto" hidden>
@@ -254,23 +315,6 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
       <h2 id="day-title">Una domenica da ricordare</h2>
       <div class="facts" id="day-facts"></div>
     </div>
-  </section>
-
-  <!-- Guestbook -->
-  <section id="messaggi">
-    <p class="eyebrow">Guestbook</p>
-    <h2>Un messaggio per Mattia</h2>
-    <p class="lead">Scrivi due righe che Mattia leggerà da grande. Puoi aggiungere una foto dal telefono e una canzone per la sua playlist. Testi e fotografie sono privati e visibili solo ai genitori, Marco e Angela. Nomi e canzoni restano nella playlist pubblica.</p>
-    <form class="panel" id="msg-form" novalidate>
-      <label for="msg-name">Il tuo nome<input id="msg-name" autocomplete="name" maxlength="40"></label>
-      <label for="msg-text">Il messaggio<textarea id="msg-text" maxlength="1200" placeholder="Caro Mattia…"></textarea></label>
-      <label for="msg-song">Una canzone per la sua playlist <small>facoltativa: titolo e artista</small><input id="msg-song" maxlength="120"></label>
-      <label for="msg-photo">Una foto <small>facoltativa</small><input id="msg-photo" type="file" accept="image/*"></label>
-      <div class="preview" id="msg-prev" hidden><img id="msg-prev-img" alt="Anteprima della foto"><button class="linkbtn" type="button" id="msg-prev-del">Togli la foto</button></div>
-      <p class="err" id="msg-err" role="alert"></p>
-      <div class="btns"><button class="btn" type="submit" id="msg-btn">Lascia il messaggio</button><span class="ok" id="msg-ok" role="status"></span></div>
-    </form>
-    <div id="notes" hidden aria-hidden="true"></div>
   </section>
 
   <!-- Playlist -->
