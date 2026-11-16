@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Arriva Mattia</title>
-<meta name="description" content="Toto-Mattia, guestbook e playlist per l'arrivo di Mattia.">
-<meta property="og:title" content="Mattia sta arrivando">
-<meta property="og:description" content="Scommetti su quando nasce e lasciagli un messaggio.">
+<title>Benvenuto Mattia ♡</title>
+<meta name="description" content="Mattia è nato! Il cartellino della nascita, le previsioni del Toto-Mattia e i messaggi da conservare per lui.">
+<meta property="og:title" content="Benvenuto, Mattia ♡">
+<meta property="og:description" content="Mattia è arrivato! Lasciagli un messaggio e una canzone da conservare per quando sarà grande.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
@@ -41,8 +41,11 @@ p{margin:0}
 section{display:flex;flex-direction:column;gap:16px}
 
 /* Hero */
-.hero{display:flex;flex-direction:column;gap:22px}
+.hero{display:flex;flex-direction:column;gap:20px}
 .hero .names{font-size:1.05rem;color:var(--muted)}
+.hero .arrival-message{font-size:.96rem;color:var(--muted);max-width:55ch}
+body.is-born .hero h1{color:var(--ink)}
+body.is-born .hero .eyebrow{color:var(--good)}
 
 /* Stato in diretta */
 .live{display:flex;flex-direction:column;gap:4px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;max-width:520px}
@@ -57,11 +60,12 @@ section{display:flex;flex-direction:column;gap:16px}
 .tag::before{content:"";position:absolute;left:20px;top:24px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:1.5px solid var(--line)}
 .tag::after{content:"";position:absolute;left:28px;top:-26px;width:2px;height:52px;background:var(--sky);border-radius:2px;transform:rotate(14deg)}
 .tag-title{font-family:var(--f-display);font-size:1.7rem;line-height:1;margin-bottom:14px}
-.tag-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+.tag-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px 18px}
 .field{display:flex;flex-direction:column;gap:2px;min-width:0}
 .field .k{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .field .v{font-family:var(--f-mono);font-size:1.15rem;font-weight:500;border-bottom:1.5px dashed var(--line);padding-bottom:3px;min-height:1.9rem;font-variant-numeric:tabular-nums}
 .field .v.blank{color:var(--muted);opacity:.7}
+.tag-awaiting{margin-top:14px;color:var(--muted);font-size:.84rem;font-style:italic}
 .tag-photo{margin-top:16px;border-radius:12px;overflow:hidden;border:1.5px solid var(--line)}
 .tag-photo img{display:block;width:100%;height:auto}
 
@@ -156,15 +160,21 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
 @media (prefers-reduced-motion: reduce){.tag{transform:none}.live .dot{animation:none}}
 </style>
 
-<!-- Dati che aggiorna Claude (i fatti del giorno di nascita). Tutto il resto arriva dal database. -->
-<script type="application/json" id="giorno">[]</script>
+<!-- Ricordi semplici e verificabili della data della nascita; nessuna fotografia pubblica. -->
+<script type="application/json" id="giorno">[
+  {"etichetta":"Il giorno","valore":"Domenica","nota":"15 novembre 2026"},
+  {"etichetta":"La stagione","valore":"Autunno","nota":"Una domenica di novembre"},
+  {"etichetta":"Il calendario","valore":"319° giorno dell'anno","nota":"46 giorni mancavano al 2027"},
+  {"etichetta":"Per noi","valore":"Il giorno in cui sei arrivato","nota":"Mamma Angela e papà Marco"}
+]</script>
 </head>
 <body>
 <div class="wrap">
   <header class="hero">
-    <p class="eyebrow" id="hero-eyebrow">Conto alla rovescia</p>
-    <h1 id="hero-title">Mattia sta arrivando</h1>
-    <p class="names">Il nuovo Palmarino sta arrivando.<span id="hero-sub"> Arriva da un giorno all'altro: scommetti su quando nasce e quanto pesa, e lasciagli un messaggio.</span></p>
+    <p class="eyebrow" id="hero-eyebrow">È nato · domenica 15 novembre 2026</p>
+    <h1 id="hero-title">Benvenuto, Mattia</h1>
+    <p class="names"><span id="hero-intro">Il nostro piccolo campione è arrivato</span><span id="hero-sub"> per riempire la nostra vita di gioia, amore e meraviglia.</span></p>
+    <p class="arrival-message" id="hero-guest">Qui raccogliamo i vostri auguri, le canzoni e i ricordi che Mattia potrà leggere da grande.</p>
 
     <div class="live" id="live" hidden aria-live="polite">
       <div class="top"><span class="dot" aria-hidden="true"></span><span>Stato in diretta</span><span id="live-when"></span></div>
@@ -174,18 +184,19 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
     <div class="tag" id="tag" aria-label="Cartellino della culla">
       <div class="tag-title">Mattia</div>
       <div class="tag-grid">
-        <div class="field"><span class="k">Nato il</span><span class="v blank" id="t-data">__ / __ / 2026</span></div>
-        <div class="field"><span class="k">Alle ore</span><span class="v blank" id="t-ora">__ : __</span></div>
-        <div class="field"><span class="k">Peso</span><span class="v blank" id="t-peso">_.___ g</span></div>
-        <div class="field"><span class="k">Lunghezza</span><span class="v blank" id="t-lung">__ cm</span></div>
+        <div class="field"><span class="k">Nato il</span><span class="v" id="t-data">15 / 11 / 2026</span></div>
+        <div class="field" hidden><span class="k">Alle ore</span><span class="v blank" id="t-ora">__ : __</span></div>
+        <div class="field" hidden><span class="k">Peso</span><span class="v blank" id="t-peso">_.___ g</span></div>
+        <div class="field" hidden><span class="k">Lunghezza</span><span class="v blank" id="t-lung">__ cm</span></div>
       </div>
+      <p class="tag-awaiting" id="tag-awaiting">Gli altri dettagli del suo arrivo saranno aggiunti presto. ♡</p>
       <div class="tag-photo" id="t-foto" hidden><img alt="Mattia appena nato" id="t-foto-img"></div>
     </div>
     <p class="banner" id="load-err" hidden>Non riesco a caricare scommesse e messaggi in questo momento. Ricarica la pagina tra poco.</p>
   </header>
 
   <!-- PRIMA DELLA NASCITA: il toto -->
-  <section id="toto">
+  <section id="toto" hidden>
     <p class="eyebrow">Toto-Mattia</p>
     <h2>Quando nasce, quanto pesa?</h2>
     <p class="lead">Registra la tua previsione: compare subito qui sotto. Quando Mattia nasce, la classifica si calcola da sola e si scopre chi ci è andato più vicino.</p>
@@ -230,8 +241,9 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
 
   <!-- Scommesse ricevute / classifica -->
   <section id="classifica">
-    <p class="eyebrow" id="cl-eyebrow">Scommesse arrivate</p>
-    <h2 id="cl-title">Chi ha già puntato</h2>
+    <p class="eyebrow" id="cl-eyebrow">Toto-Mattia · scommesse chiuse</p>
+    <h2 id="cl-title">Le previsioni degli amici</h2>
+    <p class="lead" id="cl-help">Le puntate sono chiuse. Pubblicheremo la classifica appena avremo tutti i dettagli della nascita.</p>
     <div id="cl-body"><div class="empty">Caricamento delle scommesse…</div></div>
   </section>
 
@@ -239,7 +251,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
   <section id="giorno-sec" hidden>
     <div class="day">
       <p class="eyebrow">Il giorno in cui sei nato</p>
-      <h2 id="day-title">Com'era il mondo quel giorno</h2>
+      <h2 id="day-title">Una domenica da ricordare</h2>
       <div class="facts" id="day-facts"></div>
     </div>
   </section>
@@ -269,7 +281,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
     <div id="songs"></div>
   </section>
 
-  <footer>Con tanto affetto da Marco e Angela
+  <footer>Con amore, mamma Angela e papà Marco
     <!-- MATTIA_PRIVATE_ALBUM_V1 -->
     <div><a class="footer-album" href="./libro/">♡ Il libro di Mattia · Album privato</a></div>
   </footer>
@@ -302,8 +314,17 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
 
   function birth(){
     var i = S.info;
-    if (!i || !i.nascita_data || !i.nascita_ora || !i.peso || !i.lunghezza) return null;
-    return { data:i.nascita_data, ora:hm(i.nascita_ora), peso:Number(i.peso), lunghezza:Number(i.lunghezza), capelli:i.capelli, somiglia:i.somiglia, foto:i.foto };
+    if (!i || !i.nascita_data) return null;
+    var hasOra = !!i.nascita_ora;
+    var hasPeso = i.peso !== null && i.peso !== undefined;
+    var hasLung = i.lunghezza !== null && i.lunghezza !== undefined;
+    return {
+      data:i.nascita_data, ora:hasOra ? hm(i.nascita_ora) : null,
+      peso:hasPeso ? Number(i.peso) : null,
+      lunghezza:hasLung ? Number(i.lunghezza) : null,
+      capelli:i.capelli, somiglia:i.somiglia, foto:i.foto,
+      completa:hasOra && hasPeso && hasLung
+    };
   }
   function score(b, n){
     var hrs = Math.abs(parseLocal(b.data,hm(b.ora)) - parseLocal(n.data,n.ora)) / 36e5;
@@ -315,69 +336,105 @@ footer{color:var(--muted);font-size:.85rem;text-align:center}
   }
 
   function render(){
-    var n = birth(), born = !!n;
+    var n = birth(), born = !!n, ready = born && n.completa;
+    document.body.classList.toggle('is-born',born);
+    $('toto').hidden = born;
 
-    // Stato in diretta
-    if (S.info && S.info.stato){
+    // Il vecchio stato d'attesa non va mostrato dopo la nascita.
+    if (S.info && S.info.stato && !born){
       $('live-txt').textContent = S.info.stato;
       try { var w = new Date(S.info.stato_ora); $('live-when').textContent = '· ' + w.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + ', ' + w.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}); } catch(e){}
       $('live').hidden = false;
     } else { $('live').hidden = true; }
 
-    // Hero e cartellino
     if (born){
       $('hero-eyebrow').textContent = 'È nato · ' + fmtDayLong(n.data);
       $('hero-title').textContent = 'Benvenuto, Mattia';
-      $('hero-sub').textContent = ' Lasciagli un messaggio qui sotto: lo leggerà da grande.';
+      $('hero-intro').textContent = 'Il nostro piccolo campione è arrivato';
+      $('hero-sub').textContent = ' per riempire la nostra vita di gioia, amore e meraviglia.';
+      $('hero-guest').hidden = false;
       var p = n.data.split('-');
       $('t-data').textContent = p[2] + ' / ' + p[1] + ' / ' + p[0];
-      $('t-ora').textContent = n.ora.replace(':',' : ');
-      $('t-peso').textContent = fmtG(n.peso);
-      $('t-lung').textContent = fmtCm(n.lunghezza);
-      ['t-data','t-ora','t-peso','t-lung'].forEach(function(i){ $(i).classList.remove('blank'); });
+      $('t-data').classList.remove('blank');
+      [
+        ['t-ora',n.ora ? n.ora.replace(':',' : ') : null],
+        ['t-peso',n.peso === null ? null : fmtG(n.peso)],
+        ['t-lung',n.lunghezza === null ? null : fmtCm(n.lunghezza)]
+      ].forEach(function(pair){
+        var node = $(pair[0]);
+        node.parentNode.hidden = !pair[1];
+        if (pair[1]) { node.textContent = pair[1]; node.classList.remove('blank'); }
+      });
+      $('tag-awaiting').hidden = ready;
       if (n.foto){ $('t-foto-img').src = n.foto; $('t-foto').hidden = false; }
-      $('toto').hidden = true;
+      else { $('t-foto').hidden = true; }
+    } else {
+      $('hero-eyebrow').textContent = 'Conto alla rovescia';
+      $('hero-title').textContent = 'Mattia sta arrivando';
+      $('hero-intro').textContent = 'Il nuovo Palmarino sta arrivando.';
+      $('hero-sub').textContent = ' Arriva da un giorno all\'altro: scommetti su quando nasce e quanto pesa, e lasciagli un messaggio.';
+      $('hero-guest').hidden = true;
+      $('t-data').textContent = '__ / __ / 2026';
+      $('t-data').classList.add('blank');
+      [
+        ['t-ora','__ : __'],['t-peso','_.___ g'],['t-lung','__ cm']
+      ].forEach(function(pair){
+        var node = $(pair[0]);
+        node.parentNode.hidden = false;
+        node.textContent = pair[1]; node.classList.add('blank');
+      });
+      $('tag-awaiting').hidden = true;
+      $('t-foto').hidden = true;
     }
 
-    // Scommesse / classifica
+    // Scommesse storiche: la graduatoria esce soltanto quando i dati sono completi.
     var body = $('cl-body'); clear(body);
     var list = S.bets.slice();
+    $('cl-help').hidden = !born || ready;
+    if (born && !ready){
+      $('cl-eyebrow').textContent = 'Toto-Mattia · scommesse chiuse';
+      $('cl-title').textContent = 'Le previsioni degli amici';
+      $('cl-help').textContent = 'Le puntate sono chiuse. La classifica finale comparirà qui appena avremo ora, peso e lunghezza di Mattia.';
+    } else if (ready){
+      $('cl-eyebrow').textContent = 'Toto-Mattia · risultati';
+      $('cl-title').textContent = 'Chi ci è andato più vicino';
+    } else {
+      $('cl-eyebrow').textContent = 'Scommesse arrivate';
+    }
     if (!list.length){
       body.appendChild(el('div','empty', born ? 'Nessuna scommessa registrata.' : 'Ancora nessuna scommessa. Sii il primo: compila il modulo qui sopra.'));
-      $('cl-title').textContent = born ? 'Chi ci è andato più vicino' : 'Chi ha già puntato';
+      if (!born) $('cl-title').textContent = 'Chi ha già puntato';
     } else {
       var wrap = el('div','tbl-wrap'), t = el('table'), thead = el('thead'), hr = el('tr');
-      var cols = born ? ['','Nome','Giorno e ora','Peso','Lungh.','Bonus','Punti'] : ['Nome','Giorno e ora','Peso','Lungh.','Bonus'];
+      var cols = ready ? ['','Nome','Giorno e ora','Peso','Lungh.','Bonus','Punti'] : ['Nome','Giorno e ora','Peso','Lungh.','Bonus'];
       cols.forEach(function(c){ hr.appendChild(el('th',null,c)); }); thead.appendChild(hr); t.appendChild(thead);
-      if (born){
+      if (ready){
         list.forEach(function(b){ b._s = score(b, n); });
         list.sort(function(a,b){ return b._s - a._s; });
-        $('cl-eyebrow').textContent = 'Toto-Mattia · risultati';
-        $('cl-title').textContent = 'Chi ci è andato più vicino';
       } else {
         list.sort(function(a,b){ return parseLocal(a.data,hm(a.ora)) - parseLocal(b.data,hm(b.ora)); });
-        $('cl-title').textContent = list.length === 1 ? 'Una scommessa finora' : list.length + ' scommesse finora';
+        if (!born) $('cl-title').textContent = list.length === 1 ? 'Una scommessa finora' : list.length + ' scommesse finora';
       }
       var tb = el('tbody');
       list.forEach(function(b,i){
-        var cls = born && i===0 ? 'first' : (b.id === S.fresh ? 'fresh' : null);
+        var cls = ready && i===0 ? 'first' : (b.id === S.fresh ? 'fresh' : null);
         var tr = el('tr', cls);
-        if (born) tr.appendChild(el('td','medal', String(i+1)));
+        if (ready) tr.appendChild(el('td','medal', String(i+1)));
         tr.appendChild(el('td',null,b.nome));
         tr.appendChild(el('td','num', fmtDay(b.data) + ' · ' + hm(b.ora)));
         tr.appendChild(el('td','num', fmtG(b.peso)));
         tr.appendChild(el('td','num', fmtCm(b.lunghezza)));
         tr.appendChild(el('td',null, (b.capelli||'–') + ' · ' + (b.somiglia||'–')));
-        if (born) tr.appendChild(el('td','num', b._s.toLocaleString('it-IT')));
+        if (ready) tr.appendChild(el('td','num', b._s.toLocaleString('it-IT')));
         tb.appendChild(tr);
       });
       t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
     }
 
     // Il giorno in cui sei nato
-    if (born && GIORNO.length){
-      $('giorno-sec').hidden = false;
-      $('day-title').textContent = 'Com’era il mondo ' + fmtDayLong(n.data);
+    $('giorno-sec').hidden = !(born && n.data === '2026-11-15' && GIORNO.length);
+    if (born && n.data === '2026-11-15' && GIORNO.length){
+      $('day-title').textContent = 'Una domenica da ricordare';
       var facts = $('day-facts'); clear(facts);
       GIORNO.forEach(function(f){
         var d = el('div','fact'); d.appendChild(el('span','k',f.etichetta)); d.appendChild(el('span','v',f.valore));
